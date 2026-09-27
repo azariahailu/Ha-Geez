@@ -104,6 +104,8 @@ Copy `.env.example` to `.env.local` if you want to override the defaults.
 
 The app is a standard Next.js build. Vercel runs `next build`. The server needs a hosted libSQL database because the local file is not persistent there. Page wording, contact messages, the word list, and the admin password all live in that database and are read on each visit. An edit saved in the deployed admin updates the live pages without another deploy. Edits made only in a local `data/ha-geez.db` stay on that computer.
 
+Search waits 400ms after the last keystroke, and the Search button looks the word up at once. An identical lookup is kept for ten minutes, at the edge and in the server cache, and is dropped when a word is published, edited, or imported. The dictionary is not baked into static files: a newly added word has to be able to appear without another deploy.
+
 1. Create a free [Turso](https://turso.tech) database:
 
    ```bash

@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EntryLink } from "@/components/entry-link";
+import { cachedSearch } from "@/lib/cached-search";
 import { loadCopy } from "@/lib/copy";
-import { getPublished, searchPublished } from "@/lib/entries";
+import { getPublished } from "@/lib/entries";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -28,7 +29,7 @@ export default async function EntryPage({ params }: { params: Promise<{ id: stri
   if (!entry) notFound();
 
   const related = entry.letter
-    ? (await searchPublished("", entry.letter, 6)).entries.filter((item) => item.id !== entry.id).slice(0, 4)
+    ? (await cachedSearch("", entry.letter, 6)).entries.filter((item) => item.id !== entry.id).slice(0, 4)
     : [];
 
   return (

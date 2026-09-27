@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+const SEARCH_PAUSE_MS = 400;
+
 type Props = {
   initialQuery: string;
   initialLetter: string;
@@ -32,6 +34,8 @@ export function DictionaryBrowser({
   const [settledLetter, setSettledLetter] = useState(initialLetter);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const skipFirst = useRef(true);
+  const pause = useRef(SEARCH_PAUSE_MS);
+  const [rush, setRush] = useState(0);
   const waiting = status === "loading" || query !== settledQuery || letter !== settledLetter;
 
   useEffect(() => {
@@ -41,6 +45,8 @@ export function DictionaryBrowser({
     }
 
     const controller = new AbortController();
+    const wait = pause.current;
+    pause.current = SEARCH_PAUSE_MS;
     const timer = window.setTimeout(async () => {
       const params = new URLSearchParams();
       if (query.trim()) params.set("q", query);
@@ -69,16 +75,18 @@ export function DictionaryBrowser({
         setSettledLetter(letter);
         setStatus("error");
       }
-    }, 220);
+    }, wait);
 
     return () => {
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [query, letter]);
+  }, [query, letter, rush]);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    pause.current = 0;
+    setRush((count) => count + 1);
   }
 
   const trimmed = query.trim();

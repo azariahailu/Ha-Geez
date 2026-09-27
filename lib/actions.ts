@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import {
@@ -47,8 +47,10 @@ const submitSchema = z.object({
 });
 
 function refreshLexicon(id?: string) {
+  updateTag("lexicon");
   revalidatePath("/");
   revalidatePath("/dictionary");
+  revalidatePath("/api/search");
   revalidatePath("/admin");
   if (id) revalidatePath(`/dictionary/${id}`);
 }

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { DictionaryBrowser } from "@/components/dictionary-browser";
 import { RichText } from "@/components/rich-text";
+import { cachedSearch } from "@/lib/cached-search";
 import { loadCopy } from "@/lib/copy";
-import { searchPublished } from "@/lib/entries";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -20,7 +20,7 @@ export default async function DictionaryPage({
   const params = await searchParams;
   const query = typeof params.q === "string" ? params.q : "";
   const letter = typeof params.letter === "string" ? params.letter : "";
-  const [result, copy] = await Promise.all([searchPublished(query, letter), loadCopy()]);
+  const [result, copy] = await Promise.all([cachedSearch(query, letter), loadCopy()]);
 
   return (
     <main id="content" className="mx-auto max-w-3xl px-4 py-10">
