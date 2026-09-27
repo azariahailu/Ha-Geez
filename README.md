@@ -50,7 +50,7 @@ If the password and the recovery code are both lost, delete the single `admin_au
 
 Once signed in:
 
-- **Pending** — edit the headword, origin, or definition, then approve. Approval publishes the entry. If that headword is already published, the existing entry is updated and the ticket is removed.
+- **Pending** — edit the headword, origin, or definition, then approve. Approval publishes that ticket as its own word. A spelling that is already listed stays listed beside it.
 - **Decline** — keeps the ticket out of the lexicon. It can be restored later.
 - **Published** — correct a live entry, or send it back to the queue.
 - **Import** — load `.xlsx`, `.csv`, or `.tsv`.
@@ -77,7 +77,7 @@ The workbook that was meant to seed the lexicon uses three columns:
 4. A header row is optional. These names are recognized, in any order: `word`, `lemma`, `geez`, `letters`, `ቃል`, `ግዕዝ`, `origin`, `source`, `መነሻ`, `ምንጭ`, `definition`, `gloss`, `amharic`, `ትርጉም`.
 5. Without a recognized header, columns are read in the order word, origin, definition. Do not leave an index column in front.
 6. A title row above the header is ignored. Rows missing a word or a definition are skipped and listed.
-7. If a published headword already exists, import updates its origin and definition. Pending tickets are not overwritten.
+7. A spelling that is listed once is updated. A spelling that is already listed more than once is left as it is, so a separate sense is not overwritten. Two rows of a new spelling are both added. Pending tickets are not overwritten. Do not import the bundled workbook again: the repeated spellings in it would be skipped, and a second copy is not what that step is for.
 8. Older `.xls` files are not read. In Excel, use Save As → `.xlsx` or CSV (UTF-8).
 
 Try the samples before the full sheet:
@@ -102,11 +102,13 @@ Copy `.env.example` to `.env.local` if you want to override the defaults.
 
 ## Deploy on Vercel
 
-The app is a standard Next.js build. Vercel runs `next build`. The server needs a hosted libSQL database because the local file is not persistent there. Page wording, contact messages, the word list, and the admin password all live in that database and are read on each visit. An edit saved in the deployed admin updates the live pages without another deploy. Edits made only in a local `data/ha-geez.db` stay on that computer.
+The app is a standard Next.js build. `vercel.json` runs `npm run build`, which is `next build` and then a seed of the hosted database. The server needs a hosted libSQL database because the local file is not persistent there. Page wording, contact messages, the word list, and the admin password all live in that database and are read on each visit. An edit saved in the deployed admin updates the live pages without another deploy. Edits made only in a local `data/ha-geez.db` stay on that computer.
 
 Search waits 400ms after the last keystroke, and the Search button looks the word up at once. An identical lookup is kept for ten minutes, at the edge and in the server cache, and is dropped when a word is published, edited, or imported. The dictionary is not baked into static files: a newly added word has to be able to appear without another deploy.
 
-1. Create a free [Turso](https://turso.tech) database:
+This project has to be on GitHub before Vercel can build it. From the Cursor project, use **Create repo** and choose GitHub. The name can be `ha-geez`.
+
+1. Create a free [Turso](https://turso.tech) database named `ha-geez`. In the Turso dashboard, open the database, copy the `libsql://` URL, and create a token. Or, with the Turso CLI:
 
    ```bash
    turso db create ha-geez
@@ -114,16 +116,12 @@ Search waits 400ms after the last keystroke, and the Search button looks the wor
    turso db tokens create ha-geez
    ```
 
-2. Push this project to the git host Vercel will build from.
-3. In Vercel, import the repository as a Next.js project. Do not set a custom build command.
-4. Add environment variables:
+2. In [Vercel](https://vercel.com), choose **Add New → Project** and import the GitHub repository. Leave the framework as Next.js. The repository already sets the build command.
+3. Add environment variables for Production. Leave them available to the build (the default). Do not commit them.
    - `TURSO_DATABASE_URL` — the `libsql://` URL
    - `TURSO_AUTH_TOKEN` — the token from the step above
-5. Deploy. The first request against an empty database loads `data/geez-lexicon.xlsx`. That request can take a little while. Then open `/admin` and create the password before sharing that address.
-
-The password is not an environment variable. Create it in the browser, and keep the recovery code.
-
-If this repo lives on Origin, connect that Origin repository to the Vercel project (Vercel’s git integration, or Origin’s Vercel connection) so production builds track the branch. The app itself does not need an extra adapter: it is the usual Next.js output.
+4. Deploy. The build loads `data/geez-lexicon.xlsx` into Turso, 13,079 words, in batches, and can continue if it is interrupted. If the token is hidden from the build, the first visits load the word list instead. Refresh once if the first open fails.
+5. Open `/admin` on the live address and create the password before sharing that address. Keep the recovery code. It is shown once. The password is not an environment variable, and the one on your computer does not carry over.
 
 ## Stack
 

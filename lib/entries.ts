@@ -229,50 +229,24 @@ export async function publishEntry(id: string, draft: EntryDraft): Promise<Admin
 
     const now = new Date().toISOString();
     const key = wordKey(draft.word);
-    const other = await tx.execute({
-      sql: "SELECT id FROM entries WHERE status = 'published' AND word_key = ? AND id != ?",
-      args: [key, id],
+    await tx.execute({
+      sql: `UPDATE entries
+        SET word = ?, origin = ?, definition = ?, notes = ?, email = ?, status = 'published',
+            letter = ?, word_key = ?, sort_key = ?, updated_at = ?
+        WHERE id = ?`,
+      args: [
+        draft.word,
+        draft.origin,
+        draft.definition,
+        draft.notes,
+        current.email,
+        baseLetter(draft.word),
+        key,
+        sortKey(draft.word),
+        now,
+        id,
+      ],
     });
-
-    if (other.rows[0]) {
-      const keepId = String(other.rows[0].id);
-      await tx.execute({
-        sql: `UPDATE entries
-          SET word = ?, origin = ?, definition = ?, notes = ?, letter = ?, word_key = ?, sort_key = ?, updated_at = ?
-          WHERE id = ?`,
-        args: [
-          draft.word,
-          draft.origin,
-          draft.definition,
-          draft.notes,
-          baseLetter(draft.word),
-          key,
-          sortKey(draft.word),
-          now,
-          keepId,
-        ],
-      });
-      await tx.execute({ sql: "DELETE FROM entries WHERE id = ?", args: [id] });
-    } else {
-      await tx.execute({
-        sql: `UPDATE entries
-          SET word = ?, origin = ?, definition = ?, notes = ?, email = ?, status = 'published',
-              letter = ?, word_key = ?, sort_key = ?, updated_at = ?
-          WHERE id = ?`,
-        args: [
-          draft.word,
-          draft.origin,
-          draft.definition,
-          draft.notes,
-          current.email,
-          baseLetter(draft.word),
-          key,
-          sortKey(draft.word),
-          now,
-          id,
-        ],
-      });
-    }
 
     await tx.commit();
     return current;
@@ -282,15 +256,9 @@ export async function publishEntry(id: string, draft: EntryDraft): Promise<Admin
   }
 }
 
-export async function savePublished(id: string, draft: EntryDraft): Promise<"ok" | "missing" | "conflict"> {
+export async function savePublished(id: string, draft: EntryDraft): Promise<"ok" | "missing"> {
   const client = await getDb();
   const key = wordKey(draft.word);
-  const conflict = await client.execute({
-    sql: "SELECT id FROM entries WHERE status = 'published' AND word_key = ? AND id != ?",
-    args: [key, id],
-  });
-  if (conflict.rows[0]) return "conflict";
-
   const result = await client.execute({
     sql: `UPDATE entries
       SET word = ?, origin = ?, definition = ?, notes = ?, letter = ?, word_key = ?, sort_key = ?, updated_at = ?
@@ -334,23 +302,53 @@ export async function importPublished(rows: SheetRow[]): Promise<{
   updated: number;
   unchanged: number;
 }> {
+  const keyCounts = new Map<string, number>();
+  for (const row of rows) {
+    const key = wordKey(row.word);
+    keyCounts.set(key, (keyCounts.get(key) ?? 0) + 1);
+  }
+
   const client = await getDb();
   const tx = await client.transaction("write");
   let created = 0;
   let updated = 0;
   let unchanged = 0;
 
+  const priorCount = new Map<string, number>();
+  const keys = [...keyCounts.keys()];
+
   try {
+    for (let offset = 0; offset < keys.length; offset += 80) {
+      const chunk = keys.slice(offset, offset + 80);
+      const marks = chunk.map(() => "?").join(", ");
+      const found = await tx.execute({
+        sql: `SELECT word_key, COUNT(*) AS c FROM entries
+          WHERE status = 'published' AND word_key IN (${marks}) GROUP BY word_key`,
+        args: chunk,
+      });
+      for (const row of found.rows) priorCount.set(String(row.word_key), Number(row.c));
+    }
+
     for (const row of rows) {
       const key = wordKey(row.word);
-      const existing = await tx.execute({
-        sql: "SELECT id, word, origin, definition FROM entries WHERE status = 'published' AND word_key = ?",
-        args: [key],
-      });
       const now = new Date().toISOString();
-      const current = existing.rows[0];
-      if (current) {
+      const repeated = (keyCounts.get(key) ?? 0) > 1;
+      const prior = priorCount.get(key) ?? 0;
+      // A spelling that already has more than one published row, or that
+      // appears twice in this sheet while any copy is already published,
+      // is left alone. Updating "the" row would erase a separate sense.
+      if (prior > 1 || (repeated && prior > 0)) {
+        unchanged += 1;
+        continue;
+      }
+      if (!repeated && prior === 1) {
+        const existing = await tx.execute({
+          sql: "SELECT id, word, origin, definition FROM entries WHERE status = 'published' AND word_key = ?",
+          args: [key],
+        });
+        const current = existing.rows[0];
         if (
+          current &&
           String(current.word) === row.word &&
           String(current.origin ?? "") === row.origin &&
           String(current.definition) === row.definition
@@ -358,41 +356,43 @@ export async function importPublished(rows: SheetRow[]): Promise<{
           unchanged += 1;
           continue;
         }
-        await tx.execute({
-          sql: `UPDATE entries
-            SET word = ?, origin = ?, definition = ?, letter = ?, word_key = ?, sort_key = ?, updated_at = ?
-            WHERE id = ?`,
-          args: [
-            row.word,
-            row.origin,
-            row.definition,
-            baseLetter(row.word),
-            key,
-            sortKey(row.word),
-            now,
-            String(current.id),
-          ],
-        });
-        updated += 1;
-      } else {
-        await tx.execute({
-          sql: `INSERT INTO entries (
-            id, word, origin, definition, notes, email, status, letter, word_key, sort_key, created_at, updated_at
-          ) VALUES (?, ?, ?, ?, '', '', 'published', ?, ?, ?, ?, ?)`,
-          args: [
-            crypto.randomUUID(),
-            row.word,
-            row.origin,
-            row.definition,
-            baseLetter(row.word),
-            key,
-            sortKey(row.word),
-            now,
-            now,
-          ],
-        });
-        created += 1;
+        if (current) {
+          await tx.execute({
+            sql: `UPDATE entries
+              SET word = ?, origin = ?, definition = ?, letter = ?, word_key = ?, sort_key = ?, updated_at = ?
+              WHERE id = ?`,
+            args: [
+              row.word,
+              row.origin,
+              row.definition,
+              baseLetter(row.word),
+              key,
+              sortKey(row.word),
+              now,
+              String(current.id),
+            ],
+          });
+          updated += 1;
+          continue;
+        }
       }
+      await tx.execute({
+        sql: `INSERT INTO entries (
+          id, word, origin, definition, notes, email, status, letter, word_key, sort_key, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, '', '', 'published', ?, ?, ?, ?, ?)`,
+        args: [
+          crypto.randomUUID(),
+          row.word,
+          row.origin,
+          row.definition,
+          baseLetter(row.word),
+          key,
+          sortKey(row.word),
+          now,
+          now,
+        ],
+      });
+      created += 1;
     }
     await tx.commit();
     return { created, updated, unchanged };

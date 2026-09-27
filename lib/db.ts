@@ -7,12 +7,13 @@ import { readBundledLexicon, type LexiconRow } from "@/lib/lexicon-seed";
 import { SEED_ENTRIES } from "@/lib/seed-data";
 import { wordKey } from "@/lib/text";
 
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 const globalForDb = globalThis as unknown as {
   haGeezClient?: Client;
   haGeezReady?: Promise<void>;
   haGeezSchema?: number;
+  haGeezRemote?: boolean;
 };
 
 const SCHEMA = `
@@ -57,6 +58,11 @@ CREATE TABLE IF NOT EXISTS messages (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at);
+
+CREATE TABLE IF NOT EXISTS app_meta (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
 `;
 
 function databaseTarget(): { url: string; authToken?: string } {
@@ -111,41 +117,83 @@ function seedId(key: string): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
 }
 
-async function insertPublished(tx: Transaction, rows: LexiconRow[]) {
-  const now = new Date().toISOString();
-  const size = 80;
-  for (let offset = 0; offset < rows.length; offset += size) {
-    const group = rows.slice(offset, offset + size);
-    const placeholders = group.map(() => "(?, ?, ?, ?, '', '', 'published', ?, ?, ?, ?, ?, ?)").join(", ");
-    const args: Array<string | number> = [];
-    group.forEach((entry, index) => {
-      const key = wordKey(entry.word);
-      const seq = entry.line ?? offset + index + 1;
-      args.push(
-        seedId(`${seq}:${key}`),
-        entry.word,
-        entry.origin,
-        entry.definition,
-        baseLetter(entry.word),
-        key,
-        sortKey(entry.word),
-        seq,
-        now,
-        now,
-      );
-    });
-    await tx.execute({
-      sql: `INSERT INTO entries (
-        id, word, origin, definition, notes, email, status, letter, word_key, sort_key, seq, created_at, updated_at
-      ) VALUES ${placeholders}`,
-      args,
-    });
-  }
+type SqlExecutor = Pick<Client, "execute">;
+
+const SEED_FLAG = "lexicon_seeded";
+const SEED_BATCH = 40;
+
+function isRemoteUrl(url: string): boolean {
+  return url.startsWith("libsql:") || url.startsWith("https:") || url.startsWith("wss:");
 }
 
-async function seedIfEmpty(client: Client) {
-  const existing = await client.execute("SELECT COUNT(*) AS c FROM entries");
-  if (Number(existing.rows[0].c) > 0) return;
+async function insertIgnoreBatch(executor: SqlExecutor, rows: LexiconRow[], offset: number) {
+  if (rows.length === 0) return;
+  const now = new Date().toISOString();
+  const placeholders = rows.map(() => "(?, ?, ?, ?, '', '', 'published', ?, ?, ?, ?, ?, ?)").join(", ");
+  const args: Array<string | number> = [];
+  rows.forEach((entry, index) => {
+    const key = wordKey(entry.word);
+    const seq = entry.line ?? offset + index + 1;
+    args.push(
+      seedId(`${seq}:${key}`),
+      entry.word,
+      entry.origin,
+      entry.definition,
+      baseLetter(entry.word),
+      key,
+      sortKey(entry.word),
+      seq,
+      now,
+      now,
+    );
+  });
+  await executor.execute({
+    sql: `INSERT OR IGNORE INTO entries (
+      id, word, origin, definition, notes, email, status, letter, word_key, sort_key, seq, created_at, updated_at
+    ) VALUES ${placeholders}`,
+    args,
+  });
+}
+
+async function markSeeded(executor: SqlExecutor) {
+  await executor.execute({
+    sql: `INSERT INTO app_meta (key, value) VALUES (?, '1')
+      ON CONFLICT(key) DO UPDATE SET value = '1'`,
+    args: [SEED_FLAG],
+  });
+}
+
+async function writeSeed(client: Client, rows: LexiconRow[], remote: boolean) {
+  const size = SEED_BATCH;
+  if (!remote) {
+    const tx = await client.transaction("write");
+    try {
+      for (let offset = 0; offset < rows.length; offset += size) {
+        await insertIgnoreBatch(tx, rows.slice(offset, offset + size), offset);
+      }
+      await markSeeded(tx);
+      await tx.commit();
+    } catch (error) {
+      await rollback(tx);
+      throw error;
+    }
+    return;
+  }
+
+  // One statement per batch. A hosted insert of the full workbook must be able
+  // to stop and continue; a single transaction does not survive a timeout.
+  for (let offset = 0; offset < rows.length; offset += size) {
+    await insertIgnoreBatch(client, rows.slice(offset, offset + size), offset);
+  }
+  await markSeeded(client);
+}
+
+async function seedIfEmpty(client: Client, remote: boolean) {
+  const flagged = await client.execute({
+    sql: "SELECT value FROM app_meta WHERE key = ?",
+    args: [SEED_FLAG],
+  });
+  if (String(flagged.rows[0]?.value ?? "") === "1") return;
 
   const demo = process.env.HA_GEEZ_SEED === "demo";
   const bundled = demo ? null : readBundledLexicon();
@@ -163,19 +211,7 @@ async function seedIfEmpty(client: Client) {
     }
   }
 
-  const tx = await client.transaction("write");
-  try {
-    const count = await tx.execute("SELECT COUNT(*) AS c FROM entries");
-    if (Number(count.rows[0].c) > 0) {
-      await tx.commit();
-      return;
-    }
-    await insertPublished(tx, rows);
-    await tx.commit();
-  } catch (error) {
-    await rollback(tx);
-    throw error;
-  }
+  await writeSeed(client, rows, remote);
 }
 
 export async function rollback(tx: Transaction) {
@@ -189,15 +225,17 @@ export async function rollback(tx: Transaction) {
 export async function getDb(): Promise<Client> {
   if (!globalForDb.haGeezClient) {
     const target = databaseTarget();
+    globalForDb.haGeezRemote = isRemoteUrl(target.url);
     globalForDb.haGeezClient = createClient(target);
   }
 
   if (!globalForDb.haGeezReady || globalForDb.haGeezSchema !== SCHEMA_VERSION) {
     const client = globalForDb.haGeezClient;
+    const remote = globalForDb.haGeezRemote === true;
     globalForDb.haGeezSchema = SCHEMA_VERSION;
     globalForDb.haGeezReady = client
       .executeMultiple(SCHEMA)
-      .then(() => seedIfEmpty(client))
+      .then(() => seedIfEmpty(client, remote))
       .catch((error: unknown) => {
         globalForDb.haGeezReady = undefined;
         throw error;

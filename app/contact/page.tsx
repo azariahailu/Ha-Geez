@@ -6,10 +6,13 @@ import { loadCopy } from "@/lib/copy";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export const metadata: Metadata = {
-  title: "Contact us",
-  description: "Send a question or a note to the people who keep ሀ ግእዝ.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = await loadCopy();
+  return {
+    title: copy["contact.title"],
+    description: "Send a question or a note to the people who keep ሀ ግእዝ.",
+  };
+}
 
 export default async function ContactPage() {
   const copy = await loadCopy();

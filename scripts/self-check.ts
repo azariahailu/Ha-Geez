@@ -106,7 +106,7 @@ process.env.HA_GEEZ_SEED = "demo";
 process.env.TURSO_DATABASE_URL = "file:/tmp/ha-geez-self-check.db";
 rmSync("/tmp/ha-geez-self-check.db", { force: true });
 
-const { searchPublished, insertSubmissions, publishEntry, importPublished, getPublished, listAdmin } =
+const { searchPublished, insertSubmissions, publishEntry, importPublished, getPublished, listAdmin, savePublished } =
   await import("../lib/entries");
 
 const peace = await searchPublished("ሰላ", "", 10);
@@ -159,6 +159,34 @@ const imported = await importPublished([
   { line: 3, word: "ወርኅ", origin: "መሠረታዊ የግዕዝ ቃል", definition: "ወር።" },
 ]);
 assert(imported.updated === 1 && imported.created === 1, "import updates an existing headword and adds a new one");
+
+const pair = await insertSubmissions({
+  email: "",
+  entries: [
+    { word: "ድርብቃል", origin: "ሀ", definition: "አንድ።", notes: "" },
+    { word: "ድርብቃል", origin: "ለ", definition: "ሁለት።", notes: "" },
+  ],
+});
+await publishEntry(pair[0], { word: "ድርብቃል", origin: "ሀ", definition: "አንድ።", notes: "" });
+await publishEntry(pair[1], { word: "ድርብቃል", origin: "ለ", definition: "ሁለት።", notes: "" });
+assert((await getPublished(pair[0]))?.definition === "አንድ።", "the first copy stays its own word");
+assert((await getPublished(pair[1]))?.definition === "ሁለት።", "a repeated spelling is published beside the first");
+assert(
+  (await savePublished(pair[0], { word: "ድርብቃል", origin: "ሀ", definition: "አንድ ተስተካክሏል።", notes: "" })) === "ok",
+  "a repeated spelling can still be edited",
+);
+assert((await getPublished(pair[1]))?.definition === "ሁለት።", "editing one copy leaves the other");
+
+const doubled = await importPublished([
+  { line: 20, word: "አዲስድርብ", origin: "ሀ", definition: "አንድ።" },
+  { line: 21, word: "አዲስድርብ", origin: "ለ", definition: "ሁለት።" },
+]);
+assert(doubled.created === 2, "two rows of a new spelling stay two words");
+const again = await importPublished([
+  { line: 20, word: "አዲስድርብ", origin: "ሀ", definition: "ተቀየረ።" },
+  { line: 21, word: "አዲስድርብ", origin: "ለ", definition: "ሁለት።" },
+]);
+assert(again.created === 0 && again.updated === 0, "importing a repeated spelling again does not add or collapse it");
 
 const { loadCopy, savePageCopy } = await import("../lib/copy");
 const { insertMessage, listMessages, deleteMessage } = await import("../lib/messages");

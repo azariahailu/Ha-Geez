@@ -8,10 +8,13 @@ import { cn } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export const metadata: Metadata = {
-  title: "About ሀ ግእዝ",
-  description: "What ሀ ግእዝ is, where the words come from, and how to look up or send a Ge'ez word.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = await loadCopy();
+  return {
+    title: `${copy["about-ha-geez.titleBefore"]} ${copy["about-ha-geez.titleName"]}`.trim(),
+    description: "What ሀ ግእዝ is, where the words come from, and how to look up or send a Ge'ez word.",
+  };
+}
 
 export default async function AboutHaGeezPage() {
   const copy = await loadCopy();

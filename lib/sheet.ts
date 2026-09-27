@@ -284,8 +284,18 @@ function worksheetRows(xml: string, strings: string[]): string[][] {
 function parseXlsx(bytes: Uint8Array): string[][] {
   let files: Record<string, Uint8Array>;
   try {
-    files = unzipSync(bytes);
-  } catch {
+    let expanded = 0;
+    files = unzipSync(bytes, {
+      filter(file) {
+        expanded += file.originalSize;
+        if (expanded > MAX_UNZIPPED) {
+          throw new Error("That spreadsheet expands to more than 20 MB. Split it and try again.");
+        }
+        return true;
+      },
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith("That spreadsheet")) throw error;
     throw new Error("That Excel file could not be opened. Save it again as .xlsx or .csv.");
   }
 

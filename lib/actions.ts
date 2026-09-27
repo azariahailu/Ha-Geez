@@ -208,9 +208,6 @@ export async function reviewEntry(input: {
   try {
     if (input.intent === "save") {
       const saved = await savePublished(input.id, draft);
-      if (saved === "conflict") {
-        return { ok: false, error: "Another published headword already uses that spelling." };
-      }
       if (saved === "missing") return { ok: false, error: "That published entry is no longer there." };
       refreshLexicon(input.id);
       return { ok: true };

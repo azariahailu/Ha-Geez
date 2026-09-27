@@ -7,10 +7,13 @@ import { loadCopy } from "@/lib/copy";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export const metadata: Metadata = {
-  title: "Dictionary",
-  description: "Search Ge'ez words and Amharic meanings in ሀ ግእዝ.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = await loadCopy();
+  return {
+    title: copy["dictionary.title"],
+    description: "Search Ge'ez words and Amharic meanings in ሀ ግእዝ.",
+  };
+}
 
 export default async function DictionaryPage({
   searchParams,

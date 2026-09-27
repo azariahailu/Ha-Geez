@@ -9,11 +9,14 @@ import { alefatFrom, fidelFrom, headersFrom, numbersFrom } from "@/lib/structure
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export const metadata: Metadata = {
-  title: "About Ge'ez",
-  description:
-    "A short introduction to Ge'ez, the liturgical language of the Ethiopian and Eritrean Orthodox churches, with the letters and the numbers.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = await loadCopy();
+  return {
+    title: copy["about.title"],
+    description:
+      "A short introduction to Ge'ez, the liturgical language of the Ethiopian and Eritrean Orthodox churches, with the letters and the numbers.",
+  };
+}
 
 function Section({
   numeral,
