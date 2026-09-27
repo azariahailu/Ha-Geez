@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AbugidaTables } from "@/components/abugida-tables";
 import { Rule } from "@/components/rule";
 import { SourceNote } from "@/components/source-note";
 import { buttonVariants } from "@/components/ui/button";
@@ -16,13 +17,15 @@ function Section({
   numeral,
   title,
   children,
+  id,
 }: {
   numeral: string;
   title: string;
   children: ReactNode;
+  id?: string;
 }) {
   return (
-    <section className="mt-10">
+    <section id={id} className="mt-10 scroll-mt-24">
       <p lang="gez" className="font-gez text-2xl text-primary">
         {numeral}
       </p>
@@ -55,20 +58,19 @@ export default function AboutPage() {
         </p>
       </Section>
 
-      <Section numeral="፪" title="Letters that carry vowels">
+      <Section id="abugida" numeral="፪" title="አበገደ, and the numbers">
         <p>
           The script did not start as it is written today. It began as an abjad: consonants were
           written, and readers supplied the vowels. By the fourth century it had become an abugida.
-          Each character is a consonant and a vowel together.
+          Each character is a consonant and a vowel together. The article on Ge&apos;ez names those
+          seven orders as /aa/, /oo/, /ee/, /u/, /ie/, /e/, and /o/.
         </p>
         <p>
-          A base letter changes shape across seven orders. The first family is{" "}
-          <span lang="gez" className="font-gez text-2xl text-primary">
-            ሀ ሁ ሂ ሃ ሄ ህ ሆ
-          </span>
-          — one consonant, seven vowels. That is why this dictionary is ordered by families, in the
-          traditional ሀሁ sequence, rather than by the Latin alphabet.
+          The lexicon itself is arranged in Ge&apos;ez alphabetic order (አ፣ በ፣ ገ፣ ደ፣…). The letter
+          names and the number of each letter are printed below as the book wrote them. The dictionary
+          on this site follows that same order.
         </p>
+        <AbugidaTables />
       </Section>
 
       <Section numeral="፫" title="After Aksum">
@@ -111,8 +113,10 @@ export default function AboutPage() {
       <Section numeral="፮" title="What ሀ ግእዝ is for">
         <p>
           ሀ ግእዝ is a public Ge&apos;ez–Amharic dictionary for readers of that tradition. Search a
-          headword, or a word inside an Amharic gloss. If you know a lemma the book does not have yet,
-          send it. An editor checks every submission before it is published.
+          headword, or a word inside an Amharic gloss. If you know a word that is not here yet, open
+          Submit a word. Write the Ge&apos;ez headword, the origin when you know it, and the meaning
+          in Amharic. After you send it, the page lists what you sent. It is saved, and it is not in
+          the public dictionary yet. When it is added, it shows up in search with the other headwords.
         </p>
         <p>
           The entries shipped with this app are a short demonstration set, so the pages are usable

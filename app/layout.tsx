@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s · ሀ ግእዝ",
   },
   description:
-    "A community lexicon from Ge'ez into Amharic. Search published headwords, or submit a word for an editor to review.",
+    "A community lexicon from Ge'ez into Amharic. Search published headwords, or submit a word you know.",
 };
 
 export const viewport: Viewport = {

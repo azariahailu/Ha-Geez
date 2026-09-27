@@ -11,8 +11,8 @@ export function SiteFooter() {
           </p>
           <SourceNote compact />
           <p className="text-sm text-muted-foreground">
-            The entries shipped with the app are a short demonstration set. Editors can replace them
-            by importing a full sheet.
+            The entries shipped with the app are a short demonstration set, until the full lexicon is
+            loaded.
           </p>
         </div>
         <div className="flex gap-4 text-sm">

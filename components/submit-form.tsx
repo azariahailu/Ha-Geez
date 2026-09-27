@@ -58,11 +58,11 @@ export function SubmitForm() {
   if (done) {
     return (
       <div className="paper p-6 sm:p-8" aria-live="polite">
-        <p className="text-sm tracking-[0.16em] text-[#8d6b2f] uppercase">Review queue</p>
-        <h2 className="mt-2 font-serif text-3xl">Received, not published yet</h2>
+        <p className="text-sm tracking-[0.16em] text-[#8d6b2f] uppercase">Saved</p>
+        <h2 className="mt-2 font-serif text-3xl">Received</h2>
         <p className="mt-3 leading-7 text-muted-foreground">
-          An editor will approve, edit, or decline each word. Until then it stays out of the public
-          dictionary.
+          These words are saved. They are not in the public dictionary yet. When a word is added, it
+          shows up in search.
         </p>
         <ul className="mt-5 space-y-2">
           {done.words.map((word) => (
@@ -73,7 +73,8 @@ export function SubmitForm() {
         </ul>
         {done.alreadyPublished.length > 0 ? (
           <p className="mt-4 text-sm leading-6 text-muted-foreground">
-            Already in the lexicon, and still sent for another look: {done.alreadyPublished.join("፣ ")}.
+            Already in the lexicon. Your note is kept so the meaning can be corrected:{" "}
+            {done.alreadyPublished.join("፣ ")}.
           </p>
         ) : null}
         <Button
@@ -105,7 +106,7 @@ export function SubmitForm() {
           className="h-11 md:text-base"
         />
         <p className="text-sm text-muted-foreground">
-          The address is visible only to editors. It is never printed on the public entry.
+          Optional. It is never printed on the public entry.
         </p>
       </div>
 
@@ -161,7 +162,7 @@ export function SubmitForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`${row.key}-notes`}>Note for the editor</Label>
+            <Label htmlFor={`${row.key}-notes`}>Note</Label>
             <Textarea
               id={`${row.key}-notes`}
               value={row.notes}
@@ -199,7 +200,7 @@ export function SubmitForm() {
           Add another word
         </Button>
         <Button type="submit" className="h-11 px-5" disabled={pending}>
-          {pending ? "Sending…" : "Send for review"}
+          {pending ? "Sending…" : "Send the words"}
         </Button>
       </div>
     </form>

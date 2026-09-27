@@ -37,8 +37,9 @@ export default async function HomePage() {
           </p>
           <p>
             ሀ ግእዝ keeps a public dictionary of that language, written in the Amharic readers use to
-            explain it. Look up a word, or propose one. Nothing is published until an editor approves
-            it.
+            explain it. Look up a word. If it is missing, send it: the headword, the origin when you
+            know it, and the meaning in Amharic. What you send is saved, and it appears in the
+            dictionary when it is added.
           </p>
         </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -59,7 +60,11 @@ export default async function HomePage() {
           </Link>
         </div>
         <p className="mt-6 text-sm text-muted-foreground">
-          {count} published {count === 1 ? "headword" : "headwords"} in the lexicon.
+          {count} published {count === 1 ? "headword" : "headwords"} in the lexicon.{" "}
+          <Link href="/about#abugida" className="underline decoration-[#c6a15a] underline-offset-4">
+            The አበገደ letters and the number table
+          </Link>{" "}
+          are copied from the lexicon as they were written.
         </p>
       </section>
 
@@ -85,17 +90,17 @@ export default async function HomePage() {
             {
               numeral: "፩",
               title: "Search",
-              body: "Type a Ge'ez lemma or an Amharic gloss. Filter by the first Fidel family, in ሀሁ order.",
+              body: "Type a Ge'ez lemma or an Amharic gloss. Filter by the first letter, in አበገደ order: አ፣ በ፣ ገ፣ ደ.",
             },
             {
               numeral: "፪",
               title: "Submit",
-              body: "Send one word or a short list: headword, origin when you know it, and an Amharic definition.",
+              body: "Open Submit a word. Write the Ge'ez headword, the origin if you know it, and the Amharic meaning. Add another row if you have more than one. An email is optional, and it is never printed on the entry.",
             },
             {
               numeral: "፫",
-              title: "Review",
-              body: "Editors approve, edit, or decline. Only approved entries appear in the public lexicon.",
+              title: "What happens next",
+              body: "The page lists the words you sent. They are saved, and they are not in the public dictionary yet. When a word is added, it shows up in search. If it is already there, your note is kept so the meaning can be corrected.",
             },
           ].map((step) => (
             <li key={step.title} className="paper p-5">

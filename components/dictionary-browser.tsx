@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { FILTER_LETTERS } from "@/lib/fidel";
 import type { PublicEntry } from "@/lib/types";
 import { EntryLink } from "@/components/entry-link";
@@ -108,7 +109,7 @@ export function DictionaryBrowser({
         <div
           className="flex gap-1 overflow-x-auto pb-2"
           role="toolbar"
-          aria-label="Filter by first letter"
+          aria-label="Filter by first letter, in አበገደ order"
         >
           <button
             type="button"
@@ -149,12 +150,20 @@ export function DictionaryBrowser({
       {entries.length === 0 ? (
         <div className="paper mt-4 px-5 py-10 text-center">
           <p className="font-gez text-3xl text-primary" lang="gez">
-            {letter || "ሀ"}
+            {letter || "አ"}
           </p>
           <p className="mt-3 text-muted-foreground">
-            {trimmed || letter
-              ? "Nothing published matches that search yet. A reader can still submit the word for review."
-              : "The lexicon is empty. An editor can import a sheet, or the demo seed will appear on a fresh database."}
+            {trimmed || letter ? (
+              <>
+                Nothing in the public dictionary matches that yet. You can send the word from{" "}
+                <Link href="/submit" className="underline decoration-[#c6a15a] underline-offset-4">
+                  Submit a word
+                </Link>
+                .
+              </>
+            ) : (
+              "The public dictionary has no entries yet."
+            )}
           </p>
         </div>
       ) : (

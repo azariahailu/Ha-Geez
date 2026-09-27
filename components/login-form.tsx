@@ -13,11 +13,10 @@ export function LoginForm({
   return (
     <form action={loginAction} className="paper mx-auto w-full max-w-md space-y-5 p-6 sm:p-8">
       <div>
-        <p className="text-sm tracking-[0.16em] text-[#8d6b2f] uppercase">Editors</p>
-        <h1 className="mt-2 font-serif text-4xl">Review queue</h1>
+        <p className="text-sm tracking-[0.16em] text-[#8d6b2f] uppercase">Lexicon desk</p>
+        <h1 className="mt-2 font-serif text-4xl">Password</h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Submissions stay private until an editor approves them. Import a full word list from this
-          same desk.
+          This page is for keeping the lexicon. A password is required.
         </p>
       </div>
       <div className="space-y-2">

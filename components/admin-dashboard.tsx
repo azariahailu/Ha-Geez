@@ -299,8 +299,8 @@ export function AdminDashboard({
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-sm tracking-[0.16em] text-[#8d6b2f] uppercase">Editors</p>
-          <h1 className="mt-1 font-serif text-4xl">Review and import</h1>
+          <p className="text-sm tracking-[0.16em] text-[#8d6b2f] uppercase">Lexicon desk</p>
+          <h1 className="mt-1 font-serif text-4xl">Words and import</h1>
         </div>
         <form action={logoutAction}>
           <Button type="submit" variant="outline">

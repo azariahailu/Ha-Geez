@@ -1,6 +1,6 @@
 # ሀ ግእዝ
 
-A community **Ge'ez → Amharic** lexicon. Readers search published headwords, or submit a word for review. Nothing reaches the public dictionary until an editor approves it. Editors can also load a full word list from Excel or CSV.
+A community **Ge'ez → Amharic** lexicon. Readers search published headwords, or submit a word. A submitted word is saved and appears in the public dictionary when it is added. The lexicon desk can also load a full word list from Excel or CSV.
 
 The pages are a Next.js app meant to run locally with one command and to deploy on Vercel.
 

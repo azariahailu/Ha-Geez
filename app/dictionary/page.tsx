@@ -26,7 +26,8 @@ export default async function DictionaryPage({
       <h1 className="mt-2 font-serif text-4xl sm:text-5xl">Dictionary</h1>
       <p className="mt-3 max-w-xl leading-7 text-muted-foreground">
         Published Ge&apos;ez headwords, with origin when we have it and a definition in Amharic.
-        Spacing does not matter: ቤተ ክርስቲያን and ቤተክርስቲያን are the same search.
+        The letters run in አበገደ order: አ፣ በ፣ ገ፣ ደ. Spacing does not matter: ቤተ ክርስቲያን and
+        ቤተክርስቲያን are the same search.
       </p>
       <div className="mt-6">
         <DictionaryBrowser

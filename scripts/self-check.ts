@@ -14,12 +14,16 @@ for (const letter of FILTER_LETTERS) {
   assert(baseLetter(letter) === letter, `${letter} should be its own base`);
 }
 
+assert(FILTER_LETTERS[0] === "አ", "አበገደ order starts with አ");
+assert(FILTER_LETTERS.indexOf("በ") < FILTER_LETTERS.indexOf("ገ"), "በ comes before ገ");
+assert(FILTER_LETTERS.indexOf("ደ") < FILTER_LETTERS.indexOf("ሀ"), "ደ comes before ሀ");
+assert(baseLetter("እ") === "አ", "እ belongs with አ");
 assert(baseLetter("ሁ") === "ሀ", "ሁ belongs with ሀ");
 assert(baseLetter("ቈ") === "ቀ", "labialized ቈ belongs with ቀ");
 assert(baseLetter("ቤተ ክርስቲያን") === "በ", "ቤተ ክርስቲያን starts with በ");
 assert(wordKey("ቤተ ክርስቲያን") === wordKey("ቤተክርስቲያን"), "spaces are ignored in the headword key");
-assert(sortKey("ሀገር") < sortKey("ለ"), "ሀ sorts before ለ");
-assert(sortKey("ሰላም") < sortKey("ሸ"), "ሰ sorts before ሸ");
+assert(sortKey("አ") < sortKey("በ") && sortKey("በ") < sortKey("ሀ"), "አ sorts before በ, and በ before ሀ");
+assert(sortKey("ሠ") < sortKey("ሸ"), "ሠ sorts before ሸ");
 
 const csv = parseLexiconSheet(
   new TextEncoder().encode("word,origin,definition\nሰላም,መሠረታዊ,ሰላም።\n,missing,definition\n"),
