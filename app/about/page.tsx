@@ -38,8 +38,8 @@ export default function AboutPage() {
       <img
         src="/eotc-seal.png"
         alt="Seal of the Ethiopian Orthodox Tewahedo Church"
-        width={720}
-        height={857}
+        width={458}
+        height={545}
         className="mx-auto mb-8 h-auto w-52 sm:w-64"
       />
       <p className="text-xs tracking-[0.2em] text-[#8d6b2f] uppercase">ስለ ግዕዝ</p>
