@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { DictionaryBrowser } from "@/components/dictionary-browser";
 import { searchPublished } from "@/lib/entries";
 
@@ -26,7 +27,12 @@ export default async function DictionaryPage({
       <h1 className="mt-2 font-serif text-4xl sm:text-5xl">Dictionary</h1>
       <p className="mt-3 max-w-xl leading-7 text-muted-foreground">
         Ge&apos;ez words, with origin and a meaning in Amharic. The letters run in አበገደ order:
-        አ፣ በ፣ ገ፣ ደ. Spacing does not matter: ቤተ ክርስቲያን and ቤተክርስቲያን are the same search.
+        አ፣ በ፣ ገ፣ ደ. Their order and meaning are on{" "}
+        <Link href="/about#abugida" className="underline decoration-[#c6a15a] underline-offset-4">
+          Letters and numbers
+        </Link>
+        {". "}
+        Spacing does not matter: ቤተ ክርስቲያን and ቤተክርስቲያን are the same search.
       </p>
       <div className="mt-6">
         <DictionaryBrowser
