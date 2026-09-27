@@ -1,10 +1,24 @@
-import { ABUGIDA_ENTRY, FIDEL_LINES, GEEZ_NUMBERS, GLORY } from "@/lib/abugida-source";
+import Link from "next/link";
+import {
+  ABUGIDA_ENTRY,
+  ALEFAT_INTRO,
+  ALEFAT_LETTERS,
+  ALEFAT_PHRASE,
+  ALEFAT_TITLE,
+  FIDEL_LINES,
+  GEEZ_NUMBERS,
+  GLORY,
+} from "@/lib/abugida-source";
 
 export function AbugidaTables() {
   return (
     <div className="space-y-8">
       <blockquote lang="am" className="border-s-2 border-[#c6a15a] ps-4 text-lg leading-8">
-        {ABUGIDA_ENTRY}
+        {ABUGIDA_ENTRY.slice(0, ABUGIDA_ENTRY.indexOf(ALEFAT_PHRASE))}
+        <Link href="#alefat" className="underline decoration-[#c6a15a] underline-offset-4">
+          {ALEFAT_PHRASE}
+        </Link>
+        {ABUGIDA_ENTRY.slice(ABUGIDA_ENTRY.indexOf(ALEFAT_PHRASE) + ALEFAT_PHRASE.length)}
       </blockquote>
 
       <div className="overflow-x-auto rounded-md border border-border bg-card">
@@ -77,6 +91,34 @@ export function AbugidaTables() {
           </li>
         ))}
       </ol>
+
+      <section id="alefat" className="scroll-mt-24">
+        <h3 lang="gez" className="font-gez text-3xl text-primary">
+          {ALEFAT_TITLE}
+        </h3>
+        <div lang="am" className="mt-3 space-y-3 text-lg leading-8">
+          {ALEFAT_INTRO.map((line) => (
+            <p key={line} className="whitespace-pre-line">
+              {line}
+            </p>
+          ))}
+        </div>
+        <ol className="mt-6 space-y-4">
+          {ALEFAT_LETTERS.map((letter) => (
+            <li key={letter.n} className="paper p-5">
+              <p className="font-gez text-2xl text-primary">
+                <span>{letter.n}.</span> <span lang="gez">{letter.name}</span>
+              </p>
+              <p lang="gez" className="font-gez mt-3 text-lg leading-8 whitespace-pre-line">
+                {letter.line}
+              </p>
+              <p lang="am" className="mt-2 text-lg leading-8 whitespace-pre-line">
+                {letter.meaning}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <p lang="gez" className="font-gez text-2xl leading-9 text-primary">
         {GLORY}

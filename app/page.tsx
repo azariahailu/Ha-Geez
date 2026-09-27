@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { EntryLink } from "@/components/entry-link";
 import { Rule } from "@/components/rule";
@@ -88,7 +89,18 @@ export default async function HomePage() {
             {
               numeral: "፩",
               title: "Search",
-              body: "Type a Ge'ez word or an Amharic meaning. Filter by the first letter, in አበገደ order: አ፣ በ፣ ገ፣ ደ.",
+              body: (
+                <>
+                  Type a Ge&apos;ez word or an Amharic meaning. Filter by the first letter, in{" "}
+                  <Link
+                    href="/about#abugida"
+                    className="underline decoration-[#c6a15a] underline-offset-4"
+                  >
+                    አበገደ order
+                  </Link>
+                  : አ፣ በ፣ ገ፣ ደ.
+                </>
+              ),
             },
             {
               numeral: "፪",
@@ -100,7 +112,7 @@ export default async function HomePage() {
               title: "What you see next",
               body: "The page lists the words you sent. You can send another from the same page.",
             },
-          ].map((step) => (
+          ].map((step: { numeral: string; title: string; body: ReactNode }) => (
             <li key={step.title} className="paper p-5">
               <span lang="gez" className="font-gez text-3xl text-primary">
                 {step.numeral}
