@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { EntryLink } from "@/components/entry-link";
 import { Rule } from "@/components/rule";
-import { SourceNote } from "@/components/source-note";
 import { buttonVariants } from "@/components/ui/button";
 import { featuredEntries, publishedCount } from "@/lib/entries";
 import { cn } from "@/lib/utils";
@@ -36,10 +35,9 @@ export default async function HomePage() {
             everyday conversation and remained the language of prayer, chant, and the church schools.
           </p>
           <p>
-            ሀ ግእዝ keeps a public dictionary of that language, written in the Amharic readers use to
-            explain it. Look up a word. If it is missing, send it: the headword, the origin when you
-            know it, and the meaning in Amharic. What you send is saved, and it appears in the
-            dictionary when it is added.
+            ሀ ግእዝ is a dictionary of that language, with the meaning in Amharic. Look up a word. If
+            it is missing, send the Ge&apos;ez word, where it comes from if you know, and the meaning
+            in Amharic.
           </p>
         </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -60,11 +58,11 @@ export default async function HomePage() {
           </Link>
         </div>
         <p className="mt-6 text-sm text-muted-foreground">
-          {count} published {count === 1 ? "headword" : "headwords"} in the lexicon.{" "}
+          {count} {count === 1 ? "word" : "words"}.{" "}
           <Link href="/about#abugida" className="underline decoration-[#c6a15a] underline-offset-4">
-            The አበገደ letters and the number table
-          </Link>{" "}
-          are copied from the lexicon as they were written.
+            Letters and numbers
+          </Link>
+          .
         </p>
       </section>
 
@@ -84,23 +82,23 @@ export default async function HomePage() {
       </section>
 
       <section className="mx-auto max-w-5xl px-4 py-8">
-        <h2 className="font-serif text-3xl">How a word gets in</h2>
+        <h2 className="font-serif text-3xl">How to use it</h2>
         <ol className="mt-5 grid gap-4 md:grid-cols-3">
           {[
             {
               numeral: "፩",
               title: "Search",
-              body: "Type a Ge'ez lemma or an Amharic gloss. Filter by the first letter, in አበገደ order: አ፣ በ፣ ገ፣ ደ.",
+              body: "Type a Ge'ez word or an Amharic meaning. Filter by the first letter, in አበገደ order: አ፣ በ፣ ገ፣ ደ.",
             },
             {
               numeral: "፪",
               title: "Submit",
-              body: "Open Submit a word. Write the Ge'ez headword, the origin if you know it, and the Amharic meaning. Add another row if you have more than one. An email is optional, and it is never printed on the entry.",
+              body: "Open Submit a word. Write the Ge'ez word, where it comes from if you know, and the meaning in Amharic. Add another row if you have more than one. An email is optional.",
             },
             {
               numeral: "፫",
-              title: "What happens next",
-              body: "The page lists the words you sent. They are saved, and they are not in the public dictionary yet. When a word is added, it shows up in search. If it is already there, your note is kept so the meaning can be corrected.",
+              title: "What you see next",
+              body: "The page lists the words you sent. You can send another from the same page.",
             },
           ].map((step) => (
             <li key={step.title} className="paper p-5">
@@ -112,9 +110,6 @@ export default async function HomePage() {
             </li>
           ))}
         </ol>
-        <div className="mt-8 max-w-2xl">
-          <SourceNote compact />
-        </div>
       </section>
     </main>
   );

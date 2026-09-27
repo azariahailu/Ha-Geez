@@ -1,16 +1,13 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { AbugidaTables } from "@/components/abugida-tables";
 import { Rule } from "@/components/rule";
-import { SourceNote } from "@/components/source-note";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { GEEZ_ARTICLE } from "@/lib/credits";
 
 export const metadata: Metadata = {
   title: "About Ge'ez",
   description:
-    "A short introduction to Ge'ez, the liturgical language of the Ethiopian and Eritrean Orthodox churches, and to the ሀ ግእዝ lexicon.",
+    "A short introduction to Ge'ez, the liturgical language of the Ethiopian and Eritrean Orthodox churches, with the letters and the numbers.",
 };
 
 function Section({
@@ -37,9 +34,19 @@ function Section({
 
 export default function AboutPage() {
   return (
-    <main id="content" className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
+    <main id="content" className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
       <p className="text-xs tracking-[0.2em] text-[#8d6b2f] uppercase">ስለ ግዕዝ</p>
       <h1 className="mt-2 font-serif text-4xl sm:text-5xl">About Ge&apos;ez</h1>
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+        (
+        <a
+          href={GEEZ_ARTICLE.url}
+          className="text-foreground underline decoration-[#c6a15a] underline-offset-4"
+        >
+          {GEEZ_ARTICLE.author}, “{GEEZ_ARTICLE.title},”
+        </a>{" "}
+        {GEEZ_ARTICLE.publisher}, {GEEZ_ARTICLE.date}.)
+      </p>
       <p className="mt-4 font-serif text-2xl leading-snug text-foreground/90">
         A South Semitic language that left the market and stayed in the church.
       </p>
@@ -66,9 +73,8 @@ export default function AboutPage() {
           seven orders as /aa/, /oo/, /ee/, /u/, /ie/, /e/, and /o/.
         </p>
         <p>
-          The lexicon itself is arranged in Ge&apos;ez alphabetic order (አ፣ በ፣ ገ፣ ደ፣…). The letter
-          names and the number of each letter are printed below as the book wrote them. The dictionary
-          on this site follows that same order.
+          The dictionary is arranged in Ge&apos;ez alphabetic order (አ፣ በ፣ ገ፣ ደ፣…). The numbers and
+          the letters follow.
         </p>
         <AbugidaTables />
       </Section>
@@ -110,38 +116,6 @@ export default function AboutPage() {
         </p>
       </Section>
 
-      <Section numeral="፮" title="What ሀ ግእዝ is for">
-        <p>
-          ሀ ግእዝ is a public Ge&apos;ez–Amharic dictionary for readers of that tradition. Search a
-          headword, or a word inside an Amharic gloss. If you know a word that is not here yet, open
-          Submit a word. Write the Ge&apos;ez headword, the origin when you know it, and the meaning
-          in Amharic. After you send it, the page lists what you sent. It is saved, and it is not in
-          the public dictionary yet. When it is added, it shows up in search with the other headwords.
-        </p>
-        <p>
-          The entries shipped with this app are a short demonstration set, so the pages are usable
-          before a full word list is imported. They are classroom glosses, not a finished scholarly
-          dictionary.
-        </p>
-        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-          <Link href="/dictionary" className={cn(buttonVariants(), "h-11 px-4 no-underline")}>
-            Open the dictionary
-          </Link>
-          <Link
-            href="/submit"
-            className={cn(buttonVariants({ variant: "outline" }), "h-11 bg-card px-4 no-underline")}
-          >
-            Submit a word
-          </Link>
-        </div>
-      </Section>
-
-      <div className="mt-12 border-t border-border pt-6">
-        <h2 className="font-serif text-2xl">Source</h2>
-        <div className="mt-3">
-          <SourceNote />
-        </div>
-      </div>
     </main>
   );
 }

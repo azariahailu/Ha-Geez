@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 export const metadata: Metadata = {
   title: "Dictionary",
-  description: "Search Ge'ez headwords and Amharic definitions in ሀ ግእዝ.",
+  description: "Search Ge'ez words and Amharic meanings in ሀ ግእዝ.",
 };
 
 export default async function DictionaryPage({
@@ -25,9 +25,8 @@ export default async function DictionaryPage({
       <p className="text-xs tracking-[0.2em] text-[#8d6b2f] uppercase">መዝገበ ቃላት</p>
       <h1 className="mt-2 font-serif text-4xl sm:text-5xl">Dictionary</h1>
       <p className="mt-3 max-w-xl leading-7 text-muted-foreground">
-        Published Ge&apos;ez headwords, with origin when we have it and a definition in Amharic.
-        The letters run in አበገደ order: አ፣ በ፣ ገ፣ ደ. Spacing does not matter: ቤተ ክርስቲያን and
-        ቤተክርስቲያን are the same search.
+        Ge&apos;ez words, with origin and a meaning in Amharic. The letters run in አበገደ order:
+        አ፣ በ፣ ገ፣ ደ. Spacing does not matter: ቤተ ክርስቲያን and ቤተክርስቲያን are the same search.
       </p>
       <div className="mt-6">
         <DictionaryBrowser

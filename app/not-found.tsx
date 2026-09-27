@@ -10,7 +10,7 @@ export default function NotFound() {
       </p>
       <h1 className="mt-4 font-serif text-4xl">This page is not in the book</h1>
       <p className="mt-3 leading-7 text-muted-foreground">
-        That address is not a published entry, or it may be mistyped.
+        That page is not here, or the address may be mistyped.
       </p>
       <Link href="/dictionary" className={cn(buttonVariants(), "mt-6 inline-flex h-11 px-4 no-underline")}>
         Back to the dictionary

@@ -25,7 +25,7 @@ export default async function AdminPage({
       params.error === "bad"
         ? "That password is not right."
         : params.error === "config"
-          ? "Set ADMIN_PASSWORD in the environment before signing in."
+          ? "A password has not been set."
           : null;
     return (
       <main id="content" className="mx-auto max-w-5xl px-4 py-12">

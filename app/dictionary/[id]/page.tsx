@@ -14,7 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const entry = await getPublished(id);
-  if (!entry) return { title: "Entry" };
+  if (!entry) return { title: "Not found" };
   return {
     title: entry.word,
     description: entry.definition,
@@ -39,17 +39,14 @@ export default async function EntryPage({ params }: { params: Promise<{ id: stri
         {entry.letter ? `More under ${entry.letter}` : "Back to the dictionary"}
       </Link>
       <article className="paper mt-4 px-5 py-8 sm:px-8">
-        <p className="text-xs tracking-[0.18em] text-[#8d6b2f] uppercase">Headword</p>
-        <h1 lang="gez" className="font-gez mt-2 text-5xl text-primary sm:text-6xl">
+        <h1 lang="gez" className="font-gez text-5xl text-primary sm:text-6xl">
           {entry.word}
         </h1>
         {entry.origin ? (
           <p lang="am" className="mt-4 text-lg text-[#8d6b2f]">
             {entry.origin}
           </p>
-        ) : (
-          <p className="mt-4 text-sm text-muted-foreground">No origin recorded.</p>
-        )}
+        ) : null}
         <p lang="am" className="mt-6 text-xl leading-9">
           {entry.definition}
         </p>

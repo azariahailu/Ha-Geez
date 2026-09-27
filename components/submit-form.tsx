@@ -60,10 +60,7 @@ export function SubmitForm() {
       <div className="paper p-6 sm:p-8" aria-live="polite">
         <p className="text-sm tracking-[0.16em] text-[#8d6b2f] uppercase">Saved</p>
         <h2 className="mt-2 font-serif text-3xl">Received</h2>
-        <p className="mt-3 leading-7 text-muted-foreground">
-          These words are saved. They are not in the public dictionary yet. When a word is added, it
-          shows up in search.
-        </p>
+        <p className="mt-3 leading-7 text-muted-foreground">These are the words you sent.</p>
         <ul className="mt-5 space-y-2">
           {done.words.map((word) => (
             <li key={word} lang="gez" className="font-gez text-2xl">
@@ -73,8 +70,7 @@ export function SubmitForm() {
         </ul>
         {done.alreadyPublished.length > 0 ? (
           <p className="mt-4 text-sm leading-6 text-muted-foreground">
-            Already in the lexicon. Your note is kept so the meaning can be corrected:{" "}
-            {done.alreadyPublished.join("፣ ")}.
+            Already here: {done.alreadyPublished.join("፣ ")}.
           </p>
         ) : null}
         <Button
@@ -106,7 +102,7 @@ export function SubmitForm() {
           className="h-11 md:text-base"
         />
         <p className="text-sm text-muted-foreground">
-          Optional. It is never printed on the public entry.
+          Optional. It is not shown with the word.
         </p>
       </div>
 
@@ -127,7 +123,7 @@ export function SubmitForm() {
             Word {index + 1}
           </legend>
           <div className="space-y-2">
-            <Label htmlFor={`${row.key}-word`}>Ge&apos;ez headword</Label>
+            <Label htmlFor={`${row.key}-word`}>Ge&apos;ez word</Label>
             <Input
               id={`${row.key}-word`}
               required
@@ -168,7 +164,7 @@ export function SubmitForm() {
               value={row.notes}
               onChange={(event) => update(row.key, "notes", event.target.value)}
               className="min-h-20 md:text-base"
-              placeholder="Where you found it, or why the gloss should change."
+              placeholder="Where you found it."
             />
           </div>
           {rows.length > 1 ? (

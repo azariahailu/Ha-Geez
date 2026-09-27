@@ -78,7 +78,7 @@ export function DictionaryBrowser({
     <div>
       <form action="/dictionary" method="get" onSubmit={onSubmit} className="paper p-4 sm:p-5">
         <label htmlFor="lexicon-search" className="text-sm text-muted-foreground">
-          Search a Ge&apos;ez headword or an Amharic gloss
+          Search a Ge&apos;ez word or an Amharic meaning
         </label>
         <div className="mt-2 flex flex-col gap-2 sm:flex-row">
           <Input
@@ -101,7 +101,7 @@ export function DictionaryBrowser({
             ? "Searching…"
             : status === "error"
               ? "Search failed. Check your connection and try again."
-              : `${total === 0 ? "No published entries match" : `Showing ${entries.length} of ${total}`}${trimmed ? ` for “${trimmed}”` : ""}${letter ? ` under ${letter}` : ""}.`}
+              : `${total === 0 ? "No words match" : `Showing ${entries.length} of ${total}`}${trimmed ? ` for “${trimmed}”` : ""}${letter ? ` under ${letter}` : ""}.`}
         </p>
       </form>
 
@@ -128,7 +128,7 @@ export function DictionaryBrowser({
               type="button"
               lang="gez"
               aria-pressed={letter === character}
-              aria-label={`Entries beginning with ${character}`}
+              aria-label={`Words beginning with ${character}`}
               onClick={() => setLetter(character)}
               className={cn(
                 "font-gez shrink-0 rounded-full px-2.5 py-1 text-lg leading-none",
@@ -155,14 +155,14 @@ export function DictionaryBrowser({
           <p className="mt-3 text-muted-foreground">
             {trimmed || letter ? (
               <>
-                Nothing in the public dictionary matches that yet. You can send the word from{" "}
+                Nothing matches that yet. You can send the word from{" "}
                 <Link href="/submit" className="underline decoration-[#c6a15a] underline-offset-4">
                   Submit a word
                 </Link>
                 .
               </>
             ) : (
-              "The public dictionary has no entries yet."
+              "No words are listed yet."
             )}
           </p>
         </div>
@@ -173,7 +173,7 @@ export function DictionaryBrowser({
           ))}
           {entries.length < total ? (
             <p className="py-4 text-sm text-muted-foreground">
-              {total - entries.length} more entries are hidden. Add a letter or a more specific word.
+              {total - entries.length} more words are hidden. Add a letter or a more specific word.
             </p>
           ) : null}
         </div>

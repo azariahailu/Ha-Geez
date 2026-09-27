@@ -1,157 +1,233 @@
 /**
- * Letter names and number values copied from the supplied lexicon workbook.
- * The wording is the book’s (Kidanewold Kifle, መጽሐፈ ሰዋስው ወግስ ወመዝገበ ቃላት ሐዲስ).
- * Do not paraphrase these strings.
+ * አበገደ note kept from the lexicon’s own wording.
+ * The number table and the fidel lines below are the user’s text, unchanged.
  */
 
-export const LEXICON_BOOK = "መጽሐፈ ሰዋስው ወግስ ወመዝገበ ቃላት ሐዲስ";
-
-export const ABUGIDA_ORDER_NOTE =
-  "arranged in the Ge'ez alphabetic order (አ፣ በ፣ ገ፣ ደ፣…)";
-
-/** Opening of the አበገደ entry. */
 export const ABUGIDA_ENTRY =
   "የፊደላተ ሴም የ፳፪ቱ አሌፋት ስምና አርእስት የግእዝና የዕብራይስጥ የሱርስት የዐረብ ሥርና ምንጭ ዘሩን እንደዚህ መጽሐፍ አካኼድ በእልፍ ዠምሮ ቦታው የሚጨርስ፡፡ ፪ኛም የግእዙ ተራ ሳይፋለስ ከካዕብ እስከ ሳብዕ ያሉት ፮፤ ፮ቱ እየተዛነቁ ሲጣፉ ስሙ አቡጊዳ ይባላል፡፡";
 
-export type SourceRow = {
-  letter: string;
-  text: string;
+export const GLORY = "ወስብሐት ለእግዚአብሔር (Glory be to God!)";
+
+export type NumberRow = {
+  symbol: string;
+  englishNumber: string;
+  geezName: string;
+  amharicName: string;
+  englishName: string;
 };
 
-/** Each row is the letter entry’s own wording for its place, name, and number. */
-export const ABUGIDA_LETTERS: SourceRow[] = [
-  { letter: "እ", text: "ፊደል ስመ ፊደል እ፡፡" },
-  {
-    letter: "በ",
-    text: "ኹለተኛ ፊደል በግእዝ እልፍ ቤት በአበገደ፡፡ ስሙ ቤት ቍጥሩ ኹለት አኃዝ ሲኾን በ ክልኤት ቱ ይባላል፡፡",
-  },
-  {
-    letter: "ገ",
-    text: "ሦስተኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ገልም ቍጥሩ ፫ አኃዝ ሲኾን ገ ሠለስት ቱ ይባላል፡፡",
-  },
-  {
-    letter: "ደ",
-    text: "አራተኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ድል(ን)ት ቍጥሩ አራት አኃዝ ሲኾን ደ አርባዕት ቱ ይባላል፡፡",
-  },
-  {
-    letter: "ሀ",
-    text: "፭ኛ ፊደል በግእዝ እልፍ ቤት በአገደ ስሙ ሆይ ሀይ፡፡ ቍጥሩ ዐምስት አኃዝ ሲኾን ሀ፡ ኅምስት ቱ፡ ይባላል፡፡",
-  },
-  {
-    letter: "ወ",
-    text: "፮ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ፡፡ ስሙ ዋዌ ቍጥሩ ስድስት አኃዝ ሲኾን ወ፡ ስድስት ቱ ይባላል፡፡",
-  },
-  {
-    letter: "ዘ",
-    text: "፯ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ፡፡ ስሙ ዛይ ቍጥሩ ፯ ሲኾን ዘስብዐት ቱ ይባላል፡፡",
-  },
-  {
-    letter: "ሐ",
-    text: "፰ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ሐውት ሐይት ቍጥሩ ስምንት አኃዝ ሲኾን ስምንት ቱ፡ ይባላል፡፡",
-  },
-  {
-    letter: "ጠ",
-    text: "ዘጠንኛ ፊደል በግእዝ እልፍ ቤት በአገደ ስሙ ጠይት ቍጥሩ ዘጠኝ አኃዝ ሲኾን ጠ ተስዐት ይባላል፡፡",
-  },
-  {
-    letter: "የ",
-    text: "፲ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ የማን ቍጥሩ ዐሥር አኃዝ ሲኾን የ፡ ዐሠርት ቱ ይባላል፡፡",
-  },
-  {
-    letter: "ከ",
-    text: "፲፩ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ካፍ ቍጥሩ ካያ አኃዝ ሲኾን ከዕሥራ ይባላል ካያ ኻያ ወይም ኹለት ዐሥር ማለት ነው ካዕበተ የ እንደ ማለት፡፡",
-  },
-  {
-    letter: "ለ",
-    text: "፲፪ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ለውይ ላዊ፡፡ ቍጥሩ ሠላሳ አኃዝ ሲኾን (ለ-፴) ሠላሳ ይባላል፡፡",
-  },
-  {
-    letter: "መ",
-    text: "፲፫ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ማይ ቍጥሩ አርባ አኃዝ ሲኾን (መ-፵) አርብዓ ይባላል፡፡",
-  },
-  {
-    letter: "ነ",
-    text: "፲፬ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ነሐስ ቍጥሩ ዐምሳ አኃዝ ሲኾን (ነ-፶)ኅምሳ ይባላል፡፡",
-  },
-  {
-    letter: "ሠ",
-    text: "፲፭ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ሠዉት ቍጥሩ ስሳ አኃዝ ሲኾን (ሠ-፷)ስሳ ወይም ሥልሳ ይባላል ሠለስንና ሰደሰን እይ፡፡",
-  },
-  {
-    letter: "ዐ",
-    text: "ዐሥራ ስድስተኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ዐይን ቍጥሩ ሰባ አኃዝ ሲኾን ዐ፡ ሳብዓ ይባላል፡፡",
-  },
-  {
-    letter: "ፈ",
-    text: "ዐሥራ ሰባተኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ፈፍ ቍጥሩ ሰማንያ አኃዝ ሲኾን ፈ ፹ ይባላል አፈፈን እይ፡፡",
-  },
-  {
-    letter: "ጸ",
-    text: "ዐሥራ ስምንተኛ ፊደል በጥንታዊው ተራ በግእዝ እልፍ ቤት በአበገደ ስሙ ጸደይ ቍጥሩ ዘጠና አኃዝ ጸ ፺ ይባላል፡፡",
-  },
-  {
-    letter: "ቀ",
-    text: "፲፱ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ቆፍ ቍጥር መቶ አኃዝ ሲኾን ቀ (፻)ምእት ይባላል፡፡",
-  },
-  {
-    letter: "ረ",
-    text: "ኻያኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ርእስ ቍጥሩ ኹለት መቶ አኃዝ ሲኾን (፪፻) ክልኤቱ ምእት ይባላል፡፡",
-  },
-  {
-    letter: "ሰ",
-    text: "ኻያ አንደኛ ፊደል በግእዝ እልፍ ቤት በአበገደ ስሙ ሳት ሰዓት ቍጥሩ ፫፻ አኃዝ ሲኾን ሰ ሠለስቱ ምእት ሦስት መቶ ይባላል፡፡",
-  },
-  {
-    letter: "ተ",
-    text: "ደኃራይ ፊደል ኻያ ኹለተኛ መጨረሻና መደምደሚያ በግእዝ እልፍ ቤት በአበገደ ስሙ ታዊ ታው ቍጥሩ አራት መቶ አኃዝ ሲኾን ተ (፬፻) አርባዕቱ ምእት ይባላል፡፡",
-  },
-  {
-    letter: "ኅ",
-    text: "ዘጠነኛ ፊደል የሆይ ሀ ሦስተኛ የሐውት ሐ ኹለተኛ፡፡ ስሙ ኅርም ጸሐፍት ግን ብዙኃን ይሉታል፡፡",
-  },
-  {
-    letter: "ፀ",
-    text: "፲፱ኛ ፊደል በግእዝ እልፍ ቤት በአበገደ የጸደይ ጸ፡ ተወላጅ ወይም ምክትል ኹለተኛ ዲቃላ ተቀጥላ ስሙ ፀጰ፡ በዐረብ (ፃፅ) ዳድ ይባልላ ፍችውን በቦታው ተመልከት፡፡",
-  },
-  {
-    letter: "ጰ",
-    text: "ትርፍ ዲቃላ ፈደል በመልክ በተራ ፳፭ኛ መልኩ ከጸ ድምፁ የተዴቀለ ስሙ ጴት ጰይት ይኸውም ቤት በይት እንደ ማለት ነው፡፡ ቍጥር ፮፻ አኃዝ ሲኾን ጰ ስብዐቱ ምእት ይባላል ያቡጊዳን አኃዝ ተመልከት፡፡",
-  },
-  {
-    letter: "ፐ",
-    text: "የጰ፡ ኹለተኛ ትርፍ ዲቃላ ጽርኣዊ ፊደል በመልክ በተራ ፳፮ኛ የፈ ድርብ ስሙ ፒ ፔ ይኸውም ፊ ፌ ማለት ነው ከፈ ቀጥሎ መጻፉም የፈ ድርብ ስለ ኾነ ነው፡፡",
-  },
+export const GEEZ_NUMBERS: NumberRow[] = [
+  { symbol: "፩", englishNumber: "1", geezName: "አሐዱ (Ahadu)", amharicName: "አንድ (And)", englishName: "One" },
+  { symbol: "፪", englishNumber: "2", geezName: "ክልኤቱ (Kili'etu)", amharicName: "ሁለት (Hulet)", englishName: "Two" },
+  { symbol: "፫", englishNumber: "3", geezName: "ሠለስቱ (Selesitu)", amharicName: "ሦስት (Sost)", englishName: "Three" },
+  { symbol: "፬", englishNumber: "4", geezName: "አርባዕቱ (Arba'etu)", amharicName: "አራት (Arat)", englishName: "Four" },
+  { symbol: "፭", englishNumber: "5", geezName: "ኃምስቱ (Hamisitu)", amharicName: "አምስት (Amist)", englishName: "Five" },
+  { symbol: "፮", englishNumber: "6", geezName: "ስድስቱ (Sidisitu)", amharicName: "ስድስት (Sidist)", englishName: "Six" },
+  { symbol: "፯", englishNumber: "7", geezName: "ሰብዐቱ (Seb'atu)", amharicName: "ሰባት (Sebat)", englishName: "Seven" },
+  { symbol: "፰", englishNumber: "8", geezName: "ሰመንቱ (Sementu)", amharicName: "ስምንት (Simint)", englishName: "Eight" },
+  { symbol: "፱", englishNumber: "9", geezName: "ተሰዐቱ (Tese'atu)", amharicName: "ዘጠኝ (Zetegn)", englishName: "Nine" },
+  { symbol: "፲", englishNumber: "10", geezName: "ዐሠርቱ (Asertu)", amharicName: "አሥር (Asir)", englishName: "Ten" },
+  { symbol: "፳", englishNumber: "20", geezName: "ዕሥራ (Esra)", amharicName: "ሀያ (Haya)", englishName: "Twenty" },
+  { symbol: "፴", englishNumber: "30", geezName: "ሠላሳ (Selasa)", amharicName: "ሠላሳ (Selasa)", englishName: "Thirty" },
+  { symbol: "፵", englishNumber: "40", geezName: "አርብዓ (Arb'a)", amharicName: "አርባ (Arba)", englishName: "Forty" },
+  { symbol: "፶", englishNumber: "50", geezName: "ኃምሳ (Hamsa)", amharicName: "ኃምሳ (Hamsa)", englishName: "Fifty" },
+  { symbol: "፷", englishNumber: "60", geezName: "ስድሳ (Sidsa)", amharicName: "ስድሳ (Sids)", englishName: "Sixty" },
+  { symbol: "፸", englishNumber: "70", geezName: "ሰብዓ (Seb'a)", amharicName: "ሰባ (Seba)", englishName: "Seventy" },
+  { symbol: "፹", englishNumber: "80", geezName: "ሰማንያ (Semanya)", amharicName: "ሰማንያ (Semanya)", englishName: "Eighty" },
+  { symbol: "፺", englishNumber: "90", geezName: "ተስዓ (Tes'a)", amharicName: "ዘጠኝ (Zetena)", englishName: "Ninety" },
+  { symbol: "፻", englishNumber: "100", geezName: "ምዕት (Mi'et)", amharicName: "መቶ (Meto)", englishName: "One Hundred" },
+  { symbol: "፼", englishNumber: "10,000", geezName: "እልፍ (Ilf)", amharicName: "እልፍ (አሥር ሺ)", englishName: "Ten Thousand" },
 ];
 
-/** The number clause only, still in the book’s words. */
-export const GEEZ_NUMBERS: SourceRow[] = [
-  { letter: "እ", text: "እልፍ ፲ ሺሕ መቶ ጊዜ መቶ" },
-  { letter: "በ", text: "በ ክልኤት ቱ ይባላል" },
-  { letter: "ገ", text: "ገ ሠለስት ቱ ይባላል" },
-  { letter: "ደ", text: "ደ አርባዕት ቱ ይባላል" },
-  { letter: "ሀ", text: "ሀ፡ ኅምስት ቱ፡ ይባላል" },
-  { letter: "ወ", text: "ወ፡ ስድስት ቱ ይባላል" },
-  { letter: "ዘ", text: "ዘስብዐት ቱ ይባላል" },
-  { letter: "ሐ", text: "ስምንት ቱ፡ ይባላል" },
-  { letter: "ጠ", text: "ጠ ተስዐት ይባላል" },
-  { letter: "የ", text: "የ፡ ዐሠርት ቱ ይባላል" },
-  { letter: "ከ", text: "ከዕሥራ ይባላል" },
-  { letter: "ለ", text: "(ለ-፴) ሠላሳ ይባላል" },
-  { letter: "መ", text: "(መ-፵) አርብዓ ይባላል" },
-  { letter: "ነ", text: "(ነ-፶)ኅምሳ ይባላል" },
-  { letter: "ሠ", text: "(ሠ-፷)ስሳ ወይም ሥልሳ ይባላል" },
-  { letter: "ዐ", text: "ዐ፡ ሳብዓ ይባላል" },
-  { letter: "ፈ", text: "ፈ ፹ ይባላል" },
-  { letter: "ጸ", text: "ጸ ፺ ይባላል" },
-  { letter: "ቀ", text: "ቀ (፻)ምእት ይባላል" },
-  { letter: "ረ", text: "(፪፻) ክልኤቱ ምእት ይባላል" },
-  { letter: "ሰ", text: "ሰ ሠለስቱ ምእት ሦስት መቶ ይባላል" },
-  { letter: "ተ", text: "ተ (፬፻) አርባዕቱ ምእት ይባላል" },
-  { letter: "ኅ", text: "ኅ (ሀቀ)፭፻" },
-  { letter: "ኈ", text: "ኈ ከፐ በኋላ የ፱፻ አኃዝ" },
-  { letter: "ፀ", text: "ፀ፡ ፮፻ ይባላል" },
-  { letter: "ጰ", text: "ቍጥር ፮፻ አኃዝ ሲኾን ጰ ስብዐቱ ምእት ይባላል" },
-  { letter: "ፐ", text: "የስምንት መቶ አኃዝ ይኾናል" },
-  { letter: "ቈ", text: "ቈ ከኈ በኋላ ያ፲፻ አኃዝ" },
-  { letter: "እልፍ", text: "ዐሥር ሺሕ ወይም መቶ ጊዜ መቶ (ቀቀ-፻፻፡፡ እ-፼፡፡" },
+export type FidelLine = {
+  numeral: string;
+  letter: string;
+  geez: string;
+  amharic: string;
+  english: string;
+};
+
+export const FIDEL_LINES: FidelLine[] = [
+  {
+    numeral: "፩",
+    letter: "ሀ",
+    geez: "ብሂል ሀልዎቱ ለአብ እም ቅድመ ዓለም፡፡",
+    amharic: "ማለት የአብ አኗኗሩ ከዓለም በፊት ነው፡፡",
+    english: "The existence and state of being of the Father is from before the creation of the world.",
+  },
+  {
+    numeral: "፪",
+    letter: "ለ",
+    geez: "ብሂል- ለብሰ ሥጋ እምድንግል፡፡",
+    amharic: "ማለት- ክርስቶስ ከድንግል ማርያም ሥጋን ለበሰ፡፡",
+    english: "Christ put on human flesh from the Virgin Mary.",
+  },
+  {
+    numeral: "፫",
+    letter: "ሐ",
+    geez: "ብሂል ሐመ ወሞተ ወተቀብረ፡፡",
+    amharic: "ማለት ክርስቶስ ታመመ፣ ሞተ፣ ተቀበረ፡፡",
+    english: "Christ suffered, died, and was buried.",
+  },
+  {
+    numeral: "፬",
+    letter: "መ",
+    geez: "ብሂል መንክር ግብሩ ለእግዚአብሔር፡፡",
+    amharic: "ማለት የእግዚአብሔር ሥራው ድንቅ ነው፡፡",
+    english: "Wondrous and miraculous is the work of God.",
+  },
+  {
+    numeral: "፭",
+    letter: "ሠ",
+    geez: "ብሂል ሠረቀ በሥጋ፡፡",
+    amharic: "ማለት ጌታ በሥጋ ተወለደ (ተገለጠ)፡፡",
+    english: "The Lord was manifested (born) in the flesh.",
+  },
+  {
+    numeral: "፮",
+    letter: "ረ",
+    geez: "ብሂል ረግዓት ምድር በቃሉ፡፡",
+    amharic: "ማለት ምድር በቃሉ ረጋች (ጸናች)፡፡",
+    english: "The earth became stable and established by His word.",
+  },
+  {
+    numeral: "፯",
+    letter: "ሰ",
+    geez: "ብሂል ሰብአ ኮነ እግዚእነ፡፡",
+    amharic: "ማለት ጌታችን ሰው ሆነ፡፡",
+    english: "Our Lord became human.",
+  },
+  {
+    numeral: "፰",
+    letter: "ቀ",
+    geez: "ብሂል ቀዳሚሁ ቃል፡፡",
+    amharic: "ማለት በመጀመሪያ ቃል ነበር፡፡",
+    english: "In the beginning was the Word.",
+  },
+  {
+    numeral: "፱",
+    letter: "በ",
+    geez: "ብሂል በትኅትናሁ ወረደ እግዚእነ፡፡",
+    amharic: "ማለት ጌታችን በትሕትናው ወደኛ ወረደ (ተወለደ)፡፡",
+    english: "In His absolute humility, our Lord descended to us (and was born).",
+  },
+  {
+    numeral: "፲",
+    letter: "ተ",
+    geez: "ብሂል ተሰብአ ወተሰገወ፡፡",
+    amharic: "ማለት ጌታችን ሰው ሆነ፡፡",
+    english: "Our Lord became man and took on human flesh.",
+  },
+  {
+    numeral: "፲፩",
+    letter: "ኀ",
+    geez: "ብሂል ኀያል እግዚአብሔር፡፡",
+    amharic: "ማለት እግዚአብሔር ኀያል ነው፡፡",
+    english: "God is Almighty and All-Powerful.",
+  },
+  {
+    numeral: "፲፪",
+    letter: "ነ",
+    geez: "ብሂል ነሥአ ደዌነ ወፆረ ሕማመነ፡፡",
+    amharic: "ማለት ጌታችን ደዌያችንን ያዘልን ሕመማችንን ተሸከመልን፡፡",
+    english: "Our Lord took away our infirmities and carried our sicknesses.",
+  },
+  {
+    numeral: "፲፫",
+    letter: "አ",
+    geez: "ብሂል አአኲቶ ወእሴብሖ ለእግዚአበሔር አቀድም (አእኲቶቶ ለእግዚአብሔር)",
+    amharic: "ማለት እግዚአብሔርን በፍጹም ልቤ አመሰግነዋለሁ (እግዚአብሔርን ማመስገንን አስቀድማለሁ)፡፡",
+    english: "I prioritize thanking God (I thank and praise God with all my heart).",
+  },
+  {
+    numeral: "፲፬",
+    letter: "ከ",
+    geez: "ብሂል- ከሃሊ እግዚአብሔር፡፡",
+    amharic: "ማለት – እግዚአብሔር ሁሉን ቻይ ነው፡፡",
+    english: "God is All-Powerful and capable of doing all things.",
+  },
+  {
+    numeral: "፲፭",
+    letter: "ወ",
+    geez: "ብሂል – ወረደ እም ሰማይ እግዚእነ",
+    amharic: "ወ ማለት -ጌታችን ከሰማይ ወረደ፡፡",
+    english: "Our Lord descended from heaven.",
+  },
+  {
+    numeral: "፲፮",
+    letter: "ዐ",
+    geez: "ብሂል – ዐርገ ሰማያተ እግዚእነ፡፡",
+    amharic: "ዐ ማለት – ጌታችን ወደሰማይ ወጣ /ዐረገ/፡፡",
+    english: "Our Lord ascended into the heavens.",
+  },
+  {
+    numeral: "፲፯",
+    letter: "ዘ",
+    geez: "ብሂል – ዘኲሎ ይእኅዝ እግዚአብሔር፡፡",
+    amharic: "ዘ ማለት -እግዚአብሔር ይይዛል /ሁሉን የሚይዝ ነው/፡፡",
+    english: "God sustains all (He is the Sovereign Ruler who holds all creation).",
+  },
+  {
+    numeral: "፲፰",
+    letter: "የ",
+    geez: "ብሂል – የማነ እግዚአብሔር ገብረት ኀይለ፡፡",
+    amharic: "የ ማለት – የእግዚአብሔር ቀኝ ኀይልን አደረገች፡፡",
+    english: "The right hand of God has performed acts of power.",
+  },
+  {
+    numeral: "፲፱",
+    letter: "ደ",
+    geez: "ብሂል – ደመረ ሥጋነ ምስለ መለኮቱ፡፡",
+    amharic: "ደ ማለት – ሥጋችንን ከመለኮት ጋር አንድ አደረገልን፡፡",
+    english: "He united our human flesh with His divine Godhead.",
+  },
+  {
+    numeral: "፳",
+    letter: "ገ",
+    geez: "ብሂል – ገብረ ሰማያተ በጥበቡ፡፡",
+    amharic: "ገ ማለት – ሰማያትን በጥበቡ ሠራ፡፡",
+    english: "He fashioned the heavens by His wisdom.",
+  },
+  {
+    numeral: "፳፩",
+    letter: "ጠ",
+    geez: "ብሂል – ጠዐሙ ወታእምሩ ከመ ኄር እግዚአብሔር፡፡",
+    amharic: "ጠ ማለት – የእግዚአብሔርን ቸርነት ታውቁ ዘንድ ቅመሱ፡፡",
+    english: "Taste and see that the Lord is good and kind.",
+  },
+  {
+    numeral: "፳፪",
+    letter: "ጰ",
+    geez: "ብሂል – ጰራቅሊጦስ መንፈሰ ጽድቅ፡፡",
+    amharic: "ጰ ማለት – ጰራቅሊጦስ የእውነት መንፈስ ነው፡፡",
+    english: "The Paraclete is the Spirit of Righteousness and Truth.",
+  },
+  {
+    numeral: "፳፫",
+    letter: "ፀ",
+    geez: "ብሂል – ፀሐይ ጸልመ በጊዜ ስቅለቱ ለእግዚእነ፡፡",
+    amharic: "ፀ ማለት – ጌታ በተሰቀለ ጊዜ ፀሐይ ጨለመ፡፡",
+    english: "The sun was darkened at the time of the crucifixion of our Lord.",
+  },
+  {
+    numeral: "፳፬",
+    letter: "ጸ",
+    geez: "ብሂል – ጸጋ ወክብር ተውህበ ለነ፡፡",
+    amharic: "ጸ ማለት – ጸጋ እና ክብር ለእኛ ተሰጠን፡፡",
+    english: "Grace and honor have been bestowed upon us.",
+  },
+  {
+    numeral: "፳፭",
+    letter: "ፈ",
+    geez: "ብሂል – ፈጠረ ሰማየ ወምድረ፡፡",
+    amharic: "ፈ ማለት እግዚአብሔር ሰማይና ምድርን ፈጠረ፡፡",
+    english: "God created the heavens and the earth.",
+  },
+  {
+    numeral: "፳፮",
+    letter: "ፐ",
+    geez: "ብሂል – ፓፓኤል ሥሙ ለአምላክ፡፡",
+    amharic: "ፐ ማለት – ፓፓኤል የአምላክ ስም ነው፡፡",
+    english: "Papael is the hidden, divine name of God.",
+  },
 ];
