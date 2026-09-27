@@ -5,12 +5,18 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
+  { href: "/", label: "Home" },
   { href: "/dictionary", label: "Dictionary" },
   { href: "/about", label: "About Ge'ez" },
   { href: "/about-ha-geez", label: "About ሀ ግእዝ" },
   { href: "/submit", label: "Submit" },
   { href: "/admin", label: "Admin" },
 ];
+
+function isActive(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -24,17 +30,26 @@ export function SiteHeader() {
         Skip to content
       </a>
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
-        <Link href="/" className="min-w-0">
-          <span lang="gez" className="font-gez block text-[1.65rem] leading-none text-primary">
-            ሀ ግእዝ
-          </span>
-          <span className="mt-1 block text-[0.68rem] tracking-[0.14em] text-muted-foreground uppercase">
-            Ge&apos;ez → Amharic
+        <Link href="/" className="flex min-w-0 items-center gap-2.5">
+          <img
+            src="/mark.jpg"
+            alt=""
+            width={372}
+            height={398}
+            className="h-11 w-11 shrink-0 object-contain mix-blend-multiply"
+          />
+          <span className="min-w-0">
+            <span lang="gez" className="font-gez block text-[1.65rem] leading-none text-primary">
+              ሀ ግእዝ
+            </span>
+            <span className="mt-1 block text-[0.68rem] tracking-[0.14em] text-muted-foreground uppercase">
+              Ge&apos;ez → Amharic Lexicon
+            </span>
           </span>
         </Link>
         <nav className="flex flex-wrap gap-1" aria-label="Primary">
           {LINKS.map((link) => {
-            const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+            const active = isActive(pathname, link.href);
             return (
               <Link
                 key={link.href}

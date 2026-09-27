@@ -1,3 +1,8 @@
+export const KIDANEWOLD_BOOK = {
+  title: "መጽሐፈ ሰዋስው ወግስ ወመዝገበ ቃላት ሐዲስ",
+  url: "https://clark.dirzon.com/Doc/Reader?target=telegram%3Amatsehhafa%20sawaasewe%20wagese%20wamazegaba%20qaalaate%20hhadise._PDFDrive_.pdf",
+} as const;
+
 export const GEEZ_ARTICLE = {
   author: "Isaias Haileab Gebrai",
   title: "Ge'ez",

@@ -1,14 +1,10 @@
+import Link from "next/link";
 import { loginAction } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function LoginForm({
-  error,
-}: {
-  error: string | null;
-  devPassword?: string | null;
-}) {
+export function LoginForm({ error }: { error: string | null }) {
   return (
     <form action={loginAction} className="paper mx-auto w-full max-w-md space-y-5 p-6 sm:p-8">
       <div>
@@ -31,9 +27,14 @@ export function LoginForm({
           {error}
         </p>
       ) : null}
-      <Button type="submit" className="h-11 px-5">
-        Enter
-      </Button>
+      <div className="flex flex-wrap items-center gap-4">
+        <Button type="submit" className="h-11 px-5">
+          Enter
+        </Button>
+        <Link href="/admin/reset" className="text-sm underline decoration-[#c6a15a] underline-offset-4">
+          Forgot the password?
+        </Link>
+      </div>
     </form>
   );
 }

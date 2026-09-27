@@ -4,11 +4,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import {
-  adminPassword,
+  clearRecoveryFlash,
   clearSession,
+  createAdminPassword,
   createSession,
+  hasAdminPassword,
   isAdmin,
-  passwordsMatch,
+  loginWithPassword,
+  resetWithRecovery,
+  stageRecoveryFlash,
 } from "@/lib/auth";
 import {
   findPublishedWords,
@@ -55,16 +59,68 @@ function cleanDraft(entry: z.infer<typeof draftSchema>): EntryDraft {
   };
 }
 
+function passwordIssue(password: string, confirm: string): "short" | "long" | "match" | null {
+  if (password.length < 8) return "short";
+  if (password.length > 200) return "long";
+  if (password !== confirm) return "match";
+  return null;
+}
+
 export async function loginAction(formData: FormData) {
-  const expected = adminPassword();
-  if (!expected) redirect("/admin?error=config");
   const given = String(formData.get("password") ?? "");
-  if (!passwordsMatch(given, expected)) {
+  const result = await loginWithPassword(given);
+  if (result === "unset") redirect("/admin");
+  if (result === "locked") redirect("/admin?error=locked");
+  if (result !== "ok") {
     await new Promise((resolve) => setTimeout(resolve, 400));
     redirect("/admin?error=bad");
   }
   await createSession();
   redirect("/admin");
+}
+
+export async function setupPasswordAction(formData: FormData) {
+  if (await hasAdminPassword()) redirect("/admin");
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+  const issue = passwordIssue(password, confirm);
+  if (issue) redirect(`/admin?error=${issue}`);
+  try {
+    const { recoveryCode } = await createAdminPassword(password);
+    await stageRecoveryFlash(recoveryCode);
+    await createSession();
+  } catch (error) {
+    if (error instanceof Error && error.message === "password-exists") {
+      redirect("/admin?error=taken");
+    }
+    redirect("/admin?error=save");
+  }
+  redirect("/admin");
+}
+
+export async function resetPasswordAction(formData: FormData) {
+  if (!(await hasAdminPassword())) redirect("/admin");
+  const code = String(formData.get("recovery") ?? "");
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+  const issue = passwordIssue(password, confirm);
+  if (issue) redirect(`/admin/reset?error=${issue}`);
+  const result = await resetWithRecovery(code, password);
+  if (!result.ok) {
+    if (result.reason === "unset") redirect("/admin");
+    if (result.reason === "locked") redirect("/admin/reset?error=locked");
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    redirect("/admin/reset?error=bad");
+  }
+  await stageRecoveryFlash(result.recoveryCode);
+  await createSession();
+  redirect("/admin");
+}
+
+export async function acknowledgeRecovery() {
+  if (!(await isAdmin())) return;
+  await clearRecoveryFlash();
+  revalidatePath("/admin");
 }
 
 export async function logoutAction() {

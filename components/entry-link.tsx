@@ -30,7 +30,7 @@ export function EntryLink({
           {entry.origin}
         </span>
       ) : null}
-      <span lang="am" className="mt-2 block text-lg leading-relaxed text-foreground/90">
+      <span lang="am" className="mt-2 block text-lg leading-relaxed whitespace-pre-line text-foreground/90 line-clamp-4">
         {entry.definition}
       </span>
     </Link>

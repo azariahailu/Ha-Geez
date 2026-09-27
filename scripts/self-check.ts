@@ -1,5 +1,6 @@
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { buildXlsx, parseLexiconSheet } from "../lib/sheet";
+import { mergeSheetRows } from "../lib/lexicon-seed";
 import { baseLetter, FILTER_LETTERS, sortKey } from "../lib/fidel";
 import { wordKey } from "../lib/text";
 
@@ -67,7 +68,33 @@ assert(
   "committed sample csv parses",
 );
 
+const repeated = mergeSheetRows([
+  { line: 1, word: "ቅኔ", origin: "ሀ", definition: "አንድ" },
+  { line: 2, word: "ቅኔ", origin: "", definition: "ሁለት" },
+  { line: 3, word: "ቅ ኔ", origin: "ሀ", definition: "አንድ" },
+]);
+assert(repeated.length === 1, "the same spelling merges");
+assert(repeated[0]?.definition === "አንድ\nሁለት", "each meaning is kept");
+assert(repeated[0]?.origin === "ሀ", "a repeated origin is kept once");
+
+const workbook = parseLexiconSheet(
+  readFileSync(new URL("../data/geez-lexicon.xlsx", import.meta.url)),
+  "geez-lexicon.xlsx",
+);
+assert(workbook.rows.length > 13000, "the workbook has more than 13,000 word rows");
+const lexicon = mergeSheetRows(workbook.rows);
+assert(lexicon.length > 12000, "merged headwords stay above 12,000");
+assert(
+  lexicon.some((row) => row.word === "ቤተ ክርስቲያን"),
+  "ቤተ ክርስቲያን is in the workbook",
+);
+assert(
+  (lexicon.find((row) => row.word === "ቅኔ")?.definition.split("\n").length ?? 0) > 1,
+  "ቅኔ keeps more than one meaning",
+);
+
 async function main() {
+process.env.HA_GEEZ_SEED = "demo";
 process.env.TURSO_DATABASE_URL = "file:/tmp/ha-geez-self-check.db";
 rmSync("/tmp/ha-geez-self-check.db", { force: true });
 
@@ -111,6 +138,37 @@ const imported = await importPublished([
   { line: 3, word: "ወርኅ", origin: "መሠረታዊ የግዕዝ ቃል", definition: "ወር።" },
 ]);
 assert(imported.updated === 1 && imported.created === 1, "import updates an existing headword and adds a new one");
+
+const { createAdminPassword, hasAdminPassword, loginWithPassword, resetWithRecovery } = await import(
+  "../lib/auth"
+);
+assert(!(await hasAdminPassword()), "no password until one is created");
+const created = await createAdminPassword("correct horse");
+assert(/^[A-Z0-9]{4}(?:-[A-Z0-9]{4}){3}$/.test(created.recoveryCode), "recovery code shape");
+assert(await hasAdminPassword(), "password is stored");
+let secondRefused = false;
+try {
+  await createAdminPassword("another password");
+} catch (error) {
+  secondRefused = error instanceof Error && error.message === "password-exists";
+}
+assert(secondRefused, "a second password is refused");
+assert((await loginWithPassword("wrong-password")) === "bad", "a wrong password is refused");
+assert((await loginWithPassword("correct horse")) === "ok", "the created password works");
+const reset = await resetWithRecovery(created.recoveryCode, "new-password-1");
+assert(reset.ok && reset.recoveryCode !== created.recoveryCode, "reset replaces the recovery code");
+assert(!(await resetWithRecovery(created.recoveryCode, "another-pass-2")).ok, "the old recovery code stops working");
+assert((await loginWithPassword("correct horse")) === "bad", "the old password stops working");
+assert((await loginWithPassword("new-password-1")) === "ok", "the new password works");
+if (reset.ok) {
+  const loose = reset.recoveryCode.toLowerCase().split("-").join(" ");
+  const again = await resetWithRecovery(loose, "third-password");
+  assert(again.ok, "spaces and case do not matter in the recovery code");
+}
+for (let attempt = 0; attempt < 5; attempt += 1) {
+  assert((await loginWithPassword("nope")) === "bad", "failed attempts are counted");
+}
+assert((await loginWithPassword("third-password")) === "locked", "repeated failures lock sign-in");
 
 console.log("self-check ok");
 }

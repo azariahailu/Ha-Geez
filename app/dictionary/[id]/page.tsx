@@ -17,7 +17,7 @@ export async function generateMetadata({
   if (!entry) return { title: "Not found" };
   return {
     title: entry.word,
-    description: entry.definition,
+    description: entry.definition.replace(/\s+/g, " ").slice(0, 180),
   };
 }
 
@@ -47,7 +47,7 @@ export default async function EntryPage({ params }: { params: Promise<{ id: stri
             {entry.origin}
           </p>
         ) : null}
-        <p lang="am" className="mt-6 text-xl leading-9">
+        <p lang="am" className="mt-6 text-xl leading-9 whitespace-pre-line">
           {entry.definition}
         </p>
         {entry.notes ? (

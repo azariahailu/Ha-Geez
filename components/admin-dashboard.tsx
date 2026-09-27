@@ -102,7 +102,7 @@ function Ticket({
           <span lang="gez" className="font-gez text-2xl">
             {entry.word}
           </span>
-          <span lang="am" className="mt-1 block text-sm text-muted-foreground">
+          <span lang="am" className="mt-1 block text-sm text-muted-foreground line-clamp-2 whitespace-pre-line">
             {entry.definition}
           </span>
         </summary>

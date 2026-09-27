@@ -118,10 +118,8 @@ export function SubmitForm() {
       </div>
 
       {rows.map((row, index) => (
-        <fieldset key={row.key} className="paper space-y-4 p-5">
-          <legend className="px-1 text-sm tracking-[0.14em] text-[#8d6b2f] uppercase">
-            Word {index + 1}
-          </legend>
+        <div key={row.key} className="paper space-y-4 p-5">
+          <h2 className="text-sm tracking-[0.14em] text-[#8d6b2f] uppercase">Word {index + 1}</h2>
           <div className="space-y-2">
             <Label htmlFor={`${row.key}-word`}>Ge&apos;ez word</Label>
             <Input
@@ -176,7 +174,7 @@ export function SubmitForm() {
               Remove this word
             </Button>
           ) : null}
-        </fieldset>
+        </div>
       ))}
 
       {error ? (

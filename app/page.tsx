@@ -21,7 +21,7 @@ export default async function HomePage() {
         >
           ሀ
         </p>
-        <p className="text-xs tracking-[0.22em] text-[#8d6b2f] uppercase">Liturgical lexicon</p>
+        <p className="text-xs tracking-[0.22em] text-[#8d6b2f] uppercase">Dictionary</p>
         <h1 lang="gez" className="font-gez mt-3 text-6xl text-primary sm:text-7xl">
           ሀ ግእዝ
         </h1>
@@ -58,7 +58,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <p className="mt-6 text-sm text-muted-foreground">
-          {count} {count === 1 ? "word" : "words"}.{" "}
+          {count.toLocaleString("en-US")} {count === 1 ? "word" : "words"}.{" "}
           <Link href="/about#abugida" className="underline decoration-[#c6a15a] underline-offset-4">
             Letters and numbers
           </Link>

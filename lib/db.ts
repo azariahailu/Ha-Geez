@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createClient, type Client, type ResultSet, type Transaction } from "@libsql/client";
 import { baseLetter, sortKey } from "@/lib/fidel";
+import { readBundledLexicon, type LexiconRow } from "@/lib/lexicon-seed";
 import { SEED_ENTRIES } from "@/lib/seed-data";
 import { wordKey } from "@/lib/text";
 
@@ -30,6 +31,15 @@ CREATE INDEX IF NOT EXISTS idx_entries_status ON entries(status, sort_key);
 CREATE INDEX IF NOT EXISTS idx_entries_letter ON entries(status, letter, sort_key);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_entries_published_word
   ON entries(word_key) WHERE status = 'published';
+
+CREATE TABLE IF NOT EXISTS admin_auth (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  password_hash TEXT NOT NULL,
+  recovery_hash TEXT NOT NULL,
+  session_key TEXT NOT NULL,
+  failed_attempts INTEGER NOT NULL DEFAULT 0,
+  locked_until TEXT
+);
 `;
 
 function databaseTarget(): { url: string; authToken?: string } {
@@ -84,12 +94,54 @@ function seedId(key: string): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
 }
 
+async function insertPublished(tx: Transaction, rows: LexiconRow[]) {
+  const now = new Date().toISOString();
+  const size = 80;
+  for (let offset = 0; offset < rows.length; offset += size) {
+    const group = rows.slice(offset, offset + size);
+    const placeholders = group.map(() => "(?, ?, ?, ?, '', '', 'published', ?, ?, ?, ?, ?)").join(", ");
+    const args: string[] = [];
+    for (const entry of group) {
+      const key = wordKey(entry.word);
+      args.push(
+        seedId(key),
+        entry.word,
+        entry.origin,
+        entry.definition,
+        baseLetter(entry.word),
+        key,
+        sortKey(entry.word),
+        now,
+        now,
+      );
+    }
+    await tx.execute({
+      sql: `INSERT INTO entries (
+        id, word, origin, definition, notes, email, status, letter, word_key, sort_key, created_at, updated_at
+      ) VALUES ${placeholders}`,
+      args,
+    });
+  }
+}
+
 async function seedIfEmpty(client: Client) {
-  const keys = new Set<string>();
-  for (const entry of SEED_ENTRIES) {
-    const key = wordKey(entry.word);
-    if (keys.has(key)) throw new Error(`Duplicate seed headword: ${entry.word}`);
-    keys.add(key);
+  const existing = await client.execute("SELECT COUNT(*) AS c FROM entries");
+  if (Number(existing.rows[0].c) > 0) return;
+
+  const demo = process.env.HA_GEEZ_SEED === "demo";
+  const bundled = demo ? null : readBundledLexicon();
+  if (!demo && (!bundled || bundled.length < 1000)) {
+    throw new Error("The bundled lexicon is missing from data/geez-lexicon.xlsx.");
+  }
+
+  const rows: LexiconRow[] = bundled ?? SEED_ENTRIES;
+  if (demo) {
+    const keys = new Set<string>();
+    for (const entry of rows) {
+      const key = wordKey(entry.word);
+      if (keys.has(key)) throw new Error(`Duplicate seed headword: ${entry.word}`);
+      keys.add(key);
+    }
   }
 
   const tx = await client.transaction("write");
@@ -99,27 +151,7 @@ async function seedIfEmpty(client: Client) {
       await tx.commit();
       return;
     }
-
-    const now = new Date().toISOString();
-    for (const entry of SEED_ENTRIES) {
-      const key = wordKey(entry.word);
-      await tx.execute({
-        sql: `INSERT INTO entries (
-          id, word, origin, definition, notes, email, status, letter, word_key, sort_key, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, '', '', 'published', ?, ?, ?, ?, ?)`,
-        args: [
-          seedId(key),
-          entry.word,
-          entry.origin,
-          entry.definition,
-          baseLetter(entry.word),
-          key,
-          sortKey(entry.word),
-          now,
-          now,
-        ],
-      });
-    }
+    await insertPublished(tx, rows);
     await tx.commit();
   } catch (error) {
     await rollback(tx);

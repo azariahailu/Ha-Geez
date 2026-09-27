@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { KIDANEWOLD_BOOK } from "@/lib/credits";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "About ሀ ግእዝ",
-  description: "What ሀ ግእዝ is, and how to look up or send a Ge'ez word.",
+  description: "What ሀ ግእዝ is, where the words come from, and how to look up or send a Ge'ez word.",
 };
 
 export default function AboutHaGeezPage() {
@@ -17,8 +18,8 @@ export default function AboutHaGeezPage() {
       </h1>
       <div className="mt-6 space-y-4 text-lg leading-8">
         <p>
-          ሀ ግእዝ is a Ge&apos;ez–Amharic dictionary for readers of the liturgical language. Search a
-          Ge&apos;ez word, or a word inside an Amharic meaning.
+          ሀ ግእዝ is a Ge&apos;ez–Amharic dictionary built from more than 13,000 words. Search a
+          Ge&apos;ez word, or a word inside an Amharic meaning. The origin sits under the word.
         </p>
         <p>
           If you know a word that is not here yet, open Submit a word. Write the Ge&apos;ez word, where
@@ -33,6 +34,41 @@ export default function AboutHaGeezPage() {
           .
         </p>
       </div>
+
+      <section className="mt-10">
+        <h2 className="font-serif text-3xl">Sources</h2>
+        <div className="mt-3 space-y-4 text-lg leading-8">
+          <p>
+            Most of the words come from{" "}
+            <a
+              href={KIDANEWOLD_BOOK.url}
+              lang="gez"
+              className="font-gez text-primary underline decoration-[#c6a15a] underline-offset-4"
+            >
+              {KIDANEWOLD_BOOK.title}
+            </a>
+            .
+          </p>
+          <p>Others were gathered by web scraping, and from entries sent in by the public.</p>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="font-serif text-3xl">A short tour</h2>
+        <p className="mt-3 text-lg leading-8">
+          Play this to see the home page, a search, one word, and the place where a word is sent.
+        </p>
+        <video
+          controls
+          playsInline
+          preload="metadata"
+          poster="/tour-poster.jpg"
+          className="paper mt-4 aspect-video w-full bg-[#241c16]"
+        >
+          <source src="/tour.mp4" type="video/mp4" />
+        </video>
+      </section>
+
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link href="/dictionary" className={cn(buttonVariants(), "h-11 px-4 no-underline")}>
           Open the dictionary
