@@ -98,7 +98,20 @@ const water = await searchPublished("ውሃ", "", 10);
 assert(water.entries.some((entry) => entry.word === "ማይ"), "Amharic gloss search finds ማይ");
 
 const church = await searchPublished("ቤተክርስቲያን", "", 10);
-assert(church.entries.some((entry) => entry.word === "ቤተ ክርስቲያን"), "spaceless query finds the spaced headword");
+assert(church.entries[0]?.word === "ቤተ ክርስቲያን", "the headword itself leads the search");
+
+const may = await searchPublished("ማይ", "", 8);
+assert(may.entries[0]?.word === "ማይ", "ማይ leads a search for ማይ");
+assert(
+  may.entries.every((entry) => wordKey(entry.word).includes("ማይ")),
+  "a headword search does not list gloss mentions",
+);
+const mayFamily = await searchPublished("ማይ", "መ");
+assert(mayFamily.entries[0]?.word === "ማይ", "ማይ leads under the መ tab");
+assert(
+  mayFamily.entries.every((entry) => entry.letter === "መ" && wordKey(entry.word).includes("ማይ")),
+  "መ plus ማይ stays on that family's headwords",
+);
 
 const underSa = await searchPublished("", "ሱ", 80);
 assert(underSa.entries.every((entry) => entry.letter === "ሰ"), "ሱ filters to the ሰ family");

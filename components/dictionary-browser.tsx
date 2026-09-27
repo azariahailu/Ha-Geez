@@ -26,8 +26,11 @@ export function DictionaryBrowser({
   const [letter, setLetter] = useState(initialLetter);
   const [entries, setEntries] = useState(initialEntries);
   const [total, setTotal] = useState(initialTotal);
+  const [settledQuery, setSettledQuery] = useState(initialQuery);
+  const [settledLetter, setSettledLetter] = useState(initialLetter);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const skipFirst = useRef(true);
+  const waiting = status === "loading" || query !== settledQuery || letter !== settledLetter;
 
   useEffect(() => {
     if (skipFirst.current) {
@@ -55,9 +58,13 @@ export function DictionaryBrowser({
         const data = (await response.json()) as { entries: PublicEntry[]; total: number };
         setEntries(data.entries);
         setTotal(data.total);
+        setSettledQuery(query);
+        setSettledLetter(letter);
         setStatus("idle");
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") return;
+        setSettledQuery(query);
+        setSettledLetter(letter);
         setStatus("error");
       }
     }, 220);
@@ -97,11 +104,11 @@ export function DictionaryBrowser({
           </Button>
         </div>
         <p className="mt-3 text-sm text-muted-foreground" aria-live="polite">
-          {status === "loading"
+          {waiting
             ? "Searching…"
             : status === "error"
               ? "Search failed. Check your connection and try again."
-              : `${total === 0 ? "No words match" : `Showing ${entries.length} of ${total}`}${trimmed ? ` for “${trimmed}”` : ""}${letter ? ` under ${letter}` : ""}.`}
+              : `${total === 0 ? "No words match" : `Showing ${entries.length} of ${total}`}${settledQuery.trim() ? ` for “${settledQuery.trim()}”` : ""}${settledLetter ? ` under ${settledLetter}` : ""}.`}
         </p>
       </form>
 

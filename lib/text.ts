@@ -18,8 +18,16 @@ export function hasEthiopic(input: string): boolean {
   return /[\u1200-\u137F\u1380-\u139F\u2D80-\u2DDF\uAB00-\uAB2F]/.test(input);
 }
 
+function escapeLike(input: string): string {
+  return input.replace(/[\\%_]/g, (mark) => `\\${mark}`);
+}
+
 export function likePattern(input: string): string {
-  return `%${input.replace(/[\\%_]/g, (mark) => `\\${mark}`)}%`;
+  return `%${escapeLike(input)}%`;
+}
+
+export function prefixPattern(input: string): string {
+  return `${escapeLike(input)}%`;
 }
 
 export function decodeXml(input: string): string {

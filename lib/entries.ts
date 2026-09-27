@@ -2,7 +2,7 @@ import type { Client, Row } from "@libsql/client";
 import { getDb, numberValue, rollback } from "@/lib/db";
 import { baseLetter, sortKey } from "@/lib/fidel";
 import type { SheetRow } from "@/lib/sheet";
-import { likePattern, normalize, wordKey } from "@/lib/text";
+import { likePattern, normalize, prefixPattern, wordKey } from "@/lib/text";
 import type { AdminEntry, EntryDraft, EntryStatus, PublicEntry } from "@/lib/types";
 
 const COLUMNS = `id, word, origin, definition, notes, email, status, letter, created_at, updated_at`;
@@ -33,45 +33,66 @@ export function toPublic(entry: AdminEntry): PublicEntry {
   };
 }
 
-function searchFilter(query: string, letter: string) {
-  const text = normalize(query);
-  const key = wordKey(query);
+function familyClause(letter: string) {
   const family = letter ? baseLetter(letter) || normalize(letter) : "";
-  const clauses = ["status = 'published'"];
-  const args: string[] = [];
-
-  if (family) {
-    clauses.push("letter = ?");
-    args.push(family);
-  }
-
-  if (text) {
-    const like = likePattern(text);
-    const likeKey = likePattern(key);
-    clauses.push(
-      "(word LIKE ? ESCAPE '\\' OR definition LIKE ? ESCAPE '\\' OR origin LIKE ? ESCAPE '\\' OR word_key LIKE ? ESCAPE '\\')",
-    );
-    args.push(like, like, like, likeKey);
-  }
-
-  return { where: clauses.join(" AND "), args };
+  if (!family) return { sql: "", args: [] as string[] };
+  return { sql: " AND letter = ?", args: [family] };
 }
 
 export async function searchPublished(query: string, letter: string, limit?: number | null) {
   const client = await getDb();
-  const { where, args } = searchFilter(query, letter);
-  const cap = limit === undefined ? (query.trim() || letter.trim() ? null : 80) : limit;
-  const totalResult = await client.execute({
-    sql: `SELECT COUNT(*) AS c FROM entries WHERE ${where}`,
-    args,
-  });
+  const family = familyClause(letter);
+  const text = normalize(query);
+  const key = wordKey(query);
+  const cap = limit === undefined ? (text || letter.trim() ? null : 80) : limit;
+
+  let where = `status = 'published'${family.sql}`;
+  let args = [...family.args];
+  let total = 0;
+  let rank = "";
+  const rankArgs: string[] = [];
+
+  if (text) {
+    const headWhere = `${where} AND (word LIKE ? ESCAPE '\\' OR word_key LIKE ? ESCAPE '\\')`;
+    const headArgs = [...args, likePattern(text), likePattern(key)];
+    const headCount = await client.execute({
+      sql: `SELECT COUNT(*) AS c FROM entries WHERE ${headWhere}`,
+      args: headArgs,
+    });
+    total = numberValue(headCount);
+    if (total > 0) {
+      where = headWhere;
+      args = headArgs;
+      rank = `CASE
+        WHEN word_key = ? THEN 0
+        WHEN word_key LIKE ? ESCAPE '\\' THEN 1
+        ELSE 2
+      END, `;
+      rankArgs.push(key, prefixPattern(key));
+    } else {
+      where += " AND (definition LIKE ? ESCAPE '\\' OR origin LIKE ? ESCAPE '\\')";
+      args.push(likePattern(text), likePattern(text));
+      const glossCount = await client.execute({
+        sql: `SELECT COUNT(*) AS c FROM entries WHERE ${where}`,
+        args,
+      });
+      total = numberValue(glossCount);
+    }
+  } else {
+    const counted = await client.execute({
+      sql: `SELECT COUNT(*) AS c FROM entries WHERE ${where}`,
+      args,
+    });
+    total = numberValue(counted);
+  }
+
   const rows = await client.execute({
-    sql: `SELECT ${COLUMNS} FROM entries WHERE ${where} ORDER BY sort_key, seq${cap == null ? "" : " LIMIT ?"}`,
-    args: cap == null ? args : [...args, cap],
+    sql: `SELECT ${COLUMNS} FROM entries WHERE ${where} ORDER BY ${rank}sort_key, seq${cap == null ? "" : " LIMIT ?"}`,
+    args: cap == null ? [...args, ...rankArgs] : [...args, ...rankArgs, cap],
   });
   return {
     entries: rows.rows.map((row) => toPublic(mapEntry(row))),
-    total: numberValue(totalResult),
+    total,
   };
 }
 
