@@ -107,11 +107,11 @@ export async function getPublished(id: string): Promise<PublicEntry | null> {
 }
 
 export async function featuredEntries(): Promise<PublicEntry[]> {
-  const wanted = ["ግዕዝ", "ቅኔ", "ማይ", "ቤተ ክርስቲያን"];
+  const wanted = ["ግእዝ", "ቅኔ", "ማይ", "ቤተ ክርስቲያን"];
   const keys = wanted.map((word) => wordKey(word));
   const client = await getDb();
   const result = await client.execute({
-    sql: `SELECT ${COLUMNS} FROM entries WHERE status = 'published' AND word_key IN (?, ?, ?, ?)`,
+    sql: `SELECT ${COLUMNS} FROM entries WHERE status = 'published' AND word_key IN (?, ?, ?, ?) ORDER BY seq`,
     args: keys,
   });
   const entries = result.rows.map((row) => toPublic(mapEntry(row)));
