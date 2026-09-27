@@ -35,6 +35,11 @@ export const metadata: Metadata = {
   },
   description:
     "A Ge'ez to Amharic dictionary. Search a word, or send one you know.",
+  appleWebApp: {
+    capable: true,
+    title: "ሀ ግእዝ",
+    statusBarStyle: "default",
+  },
 };
 
 export const viewport: Viewport = {
