@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   serverExternalPackages: ["@libsql/client", "libsql"],
   experimental: {
+    staleTimes: {
+      dynamic: 0,
+    },
     serverActions: {
       bodySizeLimit: "8mb",
     },

@@ -42,6 +42,9 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const [copy, signedIn] = await Promise.all([loadCopy(), isAdmin()]);
   const nav = navigation(copy);

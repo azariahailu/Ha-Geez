@@ -29,7 +29,7 @@ export default async function HomePage() {
         >
           ሀ
         </p>
-        <p className="text-xs tracking-[0.22em] text-[#8d6b2f] uppercase">{copy["home.eyebrow"]}</p>
+        <p className="text-xs tracking-[0.22em] text-[#8d6b2f]">{copy["home.eyebrow"]}</p>
         <h1 lang="gez" className="font-gez mt-3 text-6xl text-primary sm:text-7xl">
           {copy["home.title"]}
         </h1>

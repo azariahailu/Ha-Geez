@@ -69,7 +69,7 @@ const alefatHint =
   "The first line is the title. The introduction follows, one paragraph per line. Then a line that is only --- before each name. A name block is: number | name, then the Ge'ez line, then the meaning.";
 
 export const COPY_FIELDS: CopyField[] = [
-  field("home", "eyebrow", "Opening", "Small heading", "Dictionary"),
+  field("home", "eyebrow", "Opening", "Small heading", "DICTIONARY"),
   field("home", "title", "Opening", "Name", "ሀ ግእዝ"),
   field("home", "lede", "Opening", "Line under the name", "A community lexicon from Ge'ez into Amharic.", {
     rows: 2,
@@ -131,7 +131,9 @@ export const COPY_FIELDS: CopyField[] = [
   ),
 
   field("dictionary", "eyebrow", "Introduction", "Small heading", "መዝገበ ቃላት"),
-  field("dictionary", "title", "Introduction", "Title", "Dictionary"),
+  field("dictionary", "title", "Introduction", "Heading and tab", "Dictionary", {
+    hint: "This is the page heading and the Dictionary tab.",
+  }),
   field(
     "dictionary",
     "intro",
@@ -180,7 +182,9 @@ export const COPY_FIELDS: CopyField[] = [
   field("dictionary", "nearby", "A word", "Nearby heading", "Nearby"),
 
   field("about", "eyebrow", "Opening", "Small heading", "ስለ ግዕዝ"),
-  field("about", "title", "Opening", "Title", "About Ge'ez"),
+  field("about", "title", "Opening", "Heading and tab", "About Ge'ez", {
+    hint: "This is the page heading and the About Ge'ez tab.",
+  }),
   field("about", "citeAuthor", "Opening", "Citation author", GEEZ_ARTICLE.author),
   field("about", "citeTitle", "Opening", "Citation title", GEEZ_ARTICLE.title),
   field("about", "citePublisher", "Opening", "Citation publisher", GEEZ_ARTICLE.publisher, { rows: 2 }),
@@ -304,8 +308,12 @@ export const COPY_FIELDS: CopyField[] = [
   ),
 
   field("about-ha-geez", "eyebrow", "Opening", "Small heading", "ስለ ሀ ግእዝ"),
-  field("about-ha-geez", "titleBefore", "Opening", "Title, before the name", "About"),
-  field("about-ha-geez", "titleName", "Opening", "Name in the title", "ሀ ግእዝ"),
+  field("about-ha-geez", "titleBefore", "Opening", "Title, before the name", "About", {
+    hint: "With the name beside it, this is also the tab.",
+  }),
+  field("about-ha-geez", "titleName", "Opening", "Name in the title", "ሀ ግእዝ", {
+    hint: "With the words before it, this is also the tab.",
+  }),
   field(
     "about-ha-geez",
     "p1",
@@ -389,7 +397,7 @@ export const COPY_FIELDS: CopyField[] = [
   field("submit", "emailLabel", "Form", "Email label", "Email, if you want a reply"),
   field("submit", "emailPlaceholder", "Form", "Email placeholder", "optional"),
   field("submit", "emailHint", "Form", "Email note", "Optional. It is not shown with the word.", { rows: 2 }),
-  field("submit", "wordHeading", "Form", "Card heading", "Word"),
+  field("submit", "wordHeading", "Form", "Card heading", "WORD"),
   field("submit", "wordLabel", "Form", "Word label", "Ge'ez word"),
   field("submit", "wordPlaceholder", "Form", "Word placeholder", "ሰላም"),
   field("submit", "originLabel", "Form", "Origin label", "Origin, if you know it"),
@@ -402,14 +410,16 @@ export const COPY_FIELDS: CopyField[] = [
   field("submit", "add", "Form", "Add button", "Add another word"),
   field("submit", "send", "Form", "Send button", "Send the words"),
   field("submit", "sending", "Form", "While sending", "Sending…"),
-  field("submit", "savedEyebrow", "After sending", "Small heading", "Saved"),
+  field("submit", "savedEyebrow", "After sending", "Small heading", "SAVED"),
   field("submit", "savedTitle", "After sending", "Title", "Received"),
   field("submit", "savedBody", "After sending", "Line under the title", "These are the words you sent.", { rows: 2 }),
   field("submit", "already", "After sending", "If a word is already listed", "Already here:", { rows: 2 }),
   field("submit", "another", "After sending", "Button", "Submit another"),
 
   field("contact", "eyebrow", "Page", "Small heading", "መልእክት"),
-  field("contact", "title", "Page", "Title", "Contact us"),
+  field("contact", "title", "Page", "Heading and tab", "Contact us", {
+    hint: "This is the heading on the page, the tab at the top right, and the footer link. Capitals are kept as you type them.",
+  }),
   field(
     "contact",
     "intro",
@@ -435,14 +445,15 @@ export const COPY_FIELDS: CopyField[] = [
   field("contact", "another", "After sending", "Button", "Write another"),
 
   field("chrome", "brand", "Header", "Name", "ሀ ግእዝ"),
-  field("chrome", "subtitle", "Header", "Line under the name", "Ge'ez → Amharic Lexicon", { rows: 2 }),
+  field("chrome", "subtitle", "Header", "Line under the name", "GE'EZ → AMHARIC LEXICON", {
+    rows: 2,
+    hint: "Capitals are kept as you type them.",
+  }),
   field("chrome", "home", "Header", "Home", "Home"),
-  field("chrome", "dictionary", "Header", "Dictionary", "Dictionary"),
-  field("chrome", "about", "Header", "About Ge'ez", "About Ge'ez"),
-  field("chrome", "aboutApp", "Header", "About ሀ ግእዝ", "About ሀ ግእዝ"),
-  field("chrome", "submit", "Header", "Submit", "Submit"),
+  field("chrome", "submit", "Header", "Submit", "Submit", {
+    hint: "The short tab. The longer footer link is below.",
+  }),
   field("chrome", "admin", "Header", "Admin", "Admin"),
-  field("chrome", "contact", "Header", "Contact us", "Contact us"),
   field("chrome", "footerSubmit", "Footer", "Submit link", "Submit a word"),
 
   field("not-found", "title", "Missing page", "Title", "This page is not in the book"),
@@ -479,13 +490,16 @@ export function navigation(copy: Record<string, string>) {
     subtitle: copy["chrome.subtitle"],
     main: [
       { href: "/", label: copy["chrome.home"] },
-      { href: "/dictionary", label: copy["chrome.dictionary"] },
-      { href: "/about", label: copy["chrome.about"] },
-      { href: "/about-ha-geez", label: copy["chrome.aboutApp"] },
+      { href: "/dictionary", label: copy["dictionary.title"] },
+      { href: "/about", label: copy["about.title"] },
+      {
+        href: "/about-ha-geez",
+        label: `${copy["about-ha-geez.titleBefore"]} ${copy["about-ha-geez.titleName"]}`.trim(),
+      },
       { href: "/submit", label: copy["chrome.submit"] },
       { href: "/admin", label: copy["chrome.admin"] },
     ],
-    contact: { href: "/contact", label: copy["chrome.contact"] },
+    contact: { href: "/contact", label: copy["contact.title"] },
     footerSubmit: copy["chrome.footerSubmit"],
   };
 }

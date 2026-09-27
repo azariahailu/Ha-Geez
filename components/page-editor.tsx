@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { savePageAction } from "@/lib/actions";
 import type { CopyField, CopyPage } from "@/lib/site-copy";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ export function PageEditor({
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
   const groups: string[] = [];
   for (const field of fields) {
     if (!groups.includes(field.group)) groups.push(field.group);
@@ -39,6 +41,7 @@ export function PageEditor({
         return;
       }
       setSaved(true);
+      router.refresh();
     });
   }
 

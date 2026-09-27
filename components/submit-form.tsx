@@ -58,7 +58,7 @@ export function SubmitForm({ copy }: { copy: Record<string, string> }) {
   if (done) {
     return (
       <div className="paper p-6 sm:p-8" aria-live="polite">
-        <p className="text-sm tracking-[0.16em] text-[#8d6b2f] uppercase">{copy["submit.savedEyebrow"]}</p>
+        <p className="text-sm tracking-[0.16em] text-[#8d6b2f]">{copy["submit.savedEyebrow"]}</p>
         <h2 className="mt-2 font-serif text-3xl">{copy["submit.savedTitle"]}</h2>
         <p className="mt-3 leading-7 text-muted-foreground">{copy["submit.savedBody"]}</p>
         <ul className="mt-5 space-y-2">
@@ -119,7 +119,7 @@ export function SubmitForm({ copy }: { copy: Record<string, string> }) {
 
       {rows.map((row, index) => (
         <div key={row.key} className="paper space-y-4 p-5">
-          <h2 className="text-sm tracking-[0.14em] text-[#8d6b2f] uppercase">
+          <h2 className="text-sm tracking-[0.14em] text-[#8d6b2f]">
             {copy["submit.wordHeading"]} {index + 1}
           </h2>
           <div className="space-y-2">

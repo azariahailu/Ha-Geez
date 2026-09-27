@@ -16,7 +16,7 @@ export default async function ContactPage() {
 
   return (
     <main id="content" className="mx-auto max-w-2xl px-4 py-10">
-      <p className="text-xs tracking-[0.2em] text-[#8d6b2f] uppercase">{copy["contact.eyebrow"]}</p>
+      <p className="text-xs tracking-[0.2em] text-[#8d6b2f]">{copy["contact.eyebrow"]}</p>
       <h1 className="mt-2 font-serif text-4xl sm:text-5xl">{copy["contact.title"]}</h1>
       <div className="mt-4 max-w-xl space-y-4 leading-7 text-muted-foreground">
         <RichText text={copy["contact.intro"]} />

@@ -50,7 +50,7 @@ export default async function AboutPage() {
         height={545}
         className="mx-auto mb-8 h-auto w-52 sm:w-64"
       />
-      <p className="text-xs tracking-[0.2em] text-[#8d6b2f] uppercase">{copy["about.eyebrow"]}</p>
+      <p className="text-xs tracking-[0.2em] text-[#8d6b2f]">{copy["about.eyebrow"]}</p>
       <h1 className="mt-2 font-serif text-4xl sm:text-5xl">{copy["about.title"]}</h1>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
         (

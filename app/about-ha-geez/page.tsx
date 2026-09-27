@@ -18,7 +18,7 @@ export default async function AboutHaGeezPage() {
 
   return (
     <main id="content" className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
-      <p className="text-xs tracking-[0.2em] text-[#8d6b2f] uppercase">{copy["about-ha-geez.eyebrow"]}</p>
+      <p className="text-xs tracking-[0.2em] text-[#8d6b2f]">{copy["about-ha-geez.eyebrow"]}</p>
       <h1 className="mt-2 font-serif text-4xl sm:text-5xl">
         {copy["about-ha-geez.titleBefore"]}{" "}
         <span lang="gez" className="font-gez text-primary">

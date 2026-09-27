@@ -24,7 +24,7 @@ export default async function DictionaryPage({
 
   return (
     <main id="content" className="mx-auto max-w-3xl px-4 py-10">
-      <p className="text-xs tracking-[0.2em] text-[#8d6b2f] uppercase">{copy["dictionary.eyebrow"]}</p>
+      <p className="text-xs tracking-[0.2em] text-[#8d6b2f]">{copy["dictionary.eyebrow"]}</p>
       <h1 className="mt-2 font-serif text-4xl sm:text-5xl">{copy["dictionary.title"]}</h1>
       <div className="mt-3 max-w-xl leading-7 text-muted-foreground">
         <RichText text={copy["dictionary.intro"]} />

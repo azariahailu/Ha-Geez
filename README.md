@@ -55,7 +55,7 @@ Once signed in:
 - **Published** — correct a live entry, or send it back to the queue.
 - **Import** — load `.xlsx`, `.csv`, or `.tsv`.
 - **Messages** — notes from Contact us. They are not mixed with words waiting to be added.
-- **Pages** — edit the wording on any public page, including the header. Saving the original text clears that change. Images and the tour video can be pointed at another address from the same screen. The word list itself stays under Published.
+- **Pages** — edit the wording on any public page. The heading of Dictionary, About Ge'ez, About ሀ ግእዝ, and Contact us is also the tab. Capitals are kept as typed. Saving the original text clears that change. Images and the tour video can be pointed at another address from the same screen. The word list itself stays under Published.
 
 Page text, contact messages, and the word list live in the same database. Deleting `data/ha-geez.db` clears the password, the edited wording, the messages, and reloads the workbook.
 
@@ -102,7 +102,7 @@ Copy `.env.example` to `.env.local` if you want to override the defaults.
 
 ## Deploy on Vercel
 
-The app is a standard Next.js build. Vercel runs `next build`. The server needs a hosted libSQL database because the local file is not persistent there.
+The app is a standard Next.js build. Vercel runs `next build`. The server needs a hosted libSQL database because the local file is not persistent there. Page wording, contact messages, the word list, and the admin password all live in that database and are read on each visit. An edit saved in the deployed admin updates the live pages without another deploy. Edits made only in a local `data/ha-geez.db` stay on that computer.
 
 1. Create a free [Turso](https://turso.tech) database:
 

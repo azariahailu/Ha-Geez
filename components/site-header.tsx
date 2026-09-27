@@ -46,7 +46,7 @@ export function SiteHeader({
             <span lang="gez" className="font-gez block text-[1.65rem] leading-none text-primary">
               {brand}
             </span>
-            <span className="mt-1 block text-[0.68rem] tracking-[0.14em] text-muted-foreground uppercase">
+            <span className="mt-1 block text-[0.68rem] tracking-[0.14em] text-muted-foreground">
               {subtitle}
             </span>
           </span>

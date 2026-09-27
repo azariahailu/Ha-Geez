@@ -7,7 +7,17 @@ import {
 } from "@/lib/site-copy";
 import { parseAlefat, parseFidel, parseNumbers } from "@/lib/structured-copy";
 
+async function readOnEachRequest() {
+  try {
+    const { connection } = await import("next/server");
+    await connection();
+  } catch {
+    // Scripts call this outside a request. The pages themselves still opt out of a frozen build.
+  }
+}
+
 export async function loadCopy(): Promise<Record<string, string>> {
+  await readOnEachRequest();
   const client = await getDb();
   const result = await client.execute("SELECT key, body FROM page_copy");
   const overrides = new Map(result.rows.map((row) => [String(row.key), String(row.body)]));
