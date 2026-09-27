@@ -1,24 +1,40 @@
 import Link from "next/link";
-import {
-  ABUGIDA_ENTRY,
-  ALEFAT_INTRO,
-  ALEFAT_LETTERS,
-  ALEFAT_PHRASE,
-  ALEFAT_TITLE,
-  FIDEL_LINES,
-  GEEZ_NUMBERS,
-  GLORY,
-} from "@/lib/abugida-source";
+import { ALEFAT_PHRASE, type AlefatLetter, type FidelLine, type NumberRow } from "@/lib/abugida-source";
 
-export function AbugidaTables() {
+export function AbugidaTables({
+  quote,
+  numbers,
+  numberHeaders,
+  fidel,
+  alefatTitle,
+  alefatIntro,
+  alefatLetters,
+  glory,
+}: {
+  quote: string;
+  numbers: NumberRow[];
+  numberHeaders: string[];
+  fidel: FidelLine[];
+  alefatTitle: string;
+  alefatIntro: string[];
+  alefatLetters: AlefatLetter[];
+  glory: string;
+}) {
+  const phraseAt = quote.indexOf(ALEFAT_PHRASE);
   return (
     <div className="space-y-8">
       <blockquote lang="am" className="border-s-2 border-[#c6a15a] ps-4 text-lg leading-8">
-        {ABUGIDA_ENTRY.slice(0, ABUGIDA_ENTRY.indexOf(ALEFAT_PHRASE))}
-        <Link href="#alefat" className="underline decoration-[#c6a15a] underline-offset-4">
-          {ALEFAT_PHRASE}
-        </Link>
-        {ABUGIDA_ENTRY.slice(ABUGIDA_ENTRY.indexOf(ALEFAT_PHRASE) + ALEFAT_PHRASE.length)}
+        {phraseAt === -1 ? (
+          quote
+        ) : (
+          <>
+            {quote.slice(0, phraseAt)}
+            <Link href="#alefat" className="underline decoration-[#c6a15a] underline-offset-4">
+              {ALEFAT_PHRASE}
+            </Link>
+            {quote.slice(phraseAt + ALEFAT_PHRASE.length)}
+          </>
+        )}
       </blockquote>
 
       <div className="overflow-x-auto rounded-md border border-border bg-card">
@@ -26,25 +42,15 @@ export function AbugidaTables() {
           <caption className="sr-only">Ge&apos;ez numbers</caption>
           <thead>
             <tr className="border-b border-border bg-secondary/70">
-              <th scope="col" className="px-3 py-2 text-sm font-medium">
-                Symbol
-              </th>
-              <th scope="col" className="px-3 py-2 text-sm font-medium">
-                English Number
-              </th>
-              <th scope="col" className="px-3 py-2 text-sm font-medium">
-                Ge&apos;ez Name
-              </th>
-              <th scope="col" className="px-3 py-2 text-sm font-medium">
-                Amharic Name
-              </th>
-              <th scope="col" className="px-3 py-2 text-sm font-medium">
-                English Name
-              </th>
+              {numberHeaders.map((header, index) => (
+                <th key={`${header}-${index}`} scope="col" className="px-3 py-2 text-sm font-medium">
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {GEEZ_NUMBERS.map((row) => (
+            {numbers.map((row) => (
               <tr key={row.symbol} className="border-b border-border/80 last:border-0">
                 <th
                   scope="row"
@@ -68,7 +74,7 @@ export function AbugidaTables() {
       </div>
 
       <ol id="fidel" className="space-y-4">
-        {FIDEL_LINES.map((line) => (
+        {fidel.map((line) => (
           <li key={line.numeral} className="paper p-5">
             <p className="font-gez text-2xl text-primary">
               <span lang="gez">{line.numeral}.</span>{" "}
@@ -94,17 +100,17 @@ export function AbugidaTables() {
 
       <section id="alefat" className="scroll-mt-24">
         <h3 lang="gez" className="font-gez text-3xl text-primary">
-          {ALEFAT_TITLE}
+          {alefatTitle}
         </h3>
         <div lang="am" className="mt-3 space-y-3 text-lg leading-8">
-          {ALEFAT_INTRO.map((line) => (
+          {alefatIntro.map((line) => (
             <p key={line} className="whitespace-pre-line">
               {line}
             </p>
           ))}
         </div>
         <ol className="mt-6 space-y-4">
-          {ALEFAT_LETTERS.map((letter) => (
+          {alefatLetters.map((letter) => (
             <li key={letter.n} className="paper p-5">
               <p className="font-gez text-2xl text-primary">
                 <span>{letter.n}.</span> <span lang="gez">{letter.name}</span>
@@ -121,7 +127,7 @@ export function AbugidaTables() {
       </section>
 
       <p lang="gez" className="font-gez text-2xl leading-9 text-primary">
-        {GLORY}
+        {glory}
       </p>
     </div>
   );

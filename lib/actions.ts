@@ -22,6 +22,9 @@ import {
   savePublished,
   setStatus,
 } from "@/lib/entries";
+import { savePageCopy } from "@/lib/copy";
+import { deleteMessage, insertMessage } from "@/lib/messages";
+import { pageBySlug } from "@/lib/site-copy";
 import { parseLexiconSheet } from "@/lib/sheet";
 import { normalize, wordKey } from "@/lib/text";
 import type { ActionError, ActionOk, EntryDraft } from "@/lib/types";
@@ -287,3 +290,69 @@ export async function importSheet(formData: FormData): Promise<
 }
 
 type SheetPreview = { line: number; word: string; origin: string; definition: string };
+
+function refreshPages() {
+  revalidatePath("/", "layout");
+}
+
+export async function savePageAction(input: {
+  slug: string;
+  values: Record<string, string>;
+}): Promise<ActionError | ActionOk> {
+  if (!(await isAdmin())) {
+    return { ok: false, error: "Your session ended. Refresh the page and sign in again." };
+  }
+  if (!pageBySlug(input.slug)) return { ok: false, error: "That page is not editable." };
+  try {
+    const issue = await savePageCopy(input.slug, input.values);
+    if (issue) return { ok: false, error: issue };
+    refreshPages();
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "The page could not be saved." };
+  }
+}
+
+const messageSchema = z.object({
+  name: z.string().trim().min(1, "Add your name.").max(80, "That name is too long."),
+  email: z.string().trim().min(1, "Add an email address.").max(200, "That email address is too long."),
+  message: z.string().trim().min(1, "Write a message.").max(4000, "That message is too long."),
+  website: z.string().optional(),
+});
+
+export async function sendMessage(input: {
+  name: string;
+  email: string;
+  message: string;
+  website?: string;
+}): Promise<ActionError | ActionOk> {
+  if (input.website && input.website.trim()) return { ok: true };
+  const parsed = messageSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Check the form and try again." };
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(parsed.data.email)) {
+    return { ok: false, error: "That email address does not look complete." };
+  }
+  try {
+    await insertMessage({
+      name: normalize(parsed.data.name),
+      email: parsed.data.email.trim(),
+      body: parsed.data.message.normalize("NFC").replace(/[\u200B-\u200D\uFEFF]/g, "").trim(),
+    });
+    revalidatePath("/admin");
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "The message could not be sent. Try again in a moment." };
+  }
+}
+
+export async function removeMessage(id: string): Promise<ActionError | ActionOk> {
+  if (!(await isAdmin())) {
+    return { ok: false, error: "Your session ended. Refresh the page and sign in again." };
+  }
+  const removed = await deleteMessage(id);
+  if (!removed) return { ok: false, error: "That message is no longer there." };
+  revalidatePath("/admin");
+  return { ok: true };
+}

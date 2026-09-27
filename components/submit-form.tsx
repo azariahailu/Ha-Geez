@@ -19,7 +19,7 @@ function blankRow(): Row {
   return { key: crypto.randomUUID(), word: "", origin: "", definition: "", notes: "" };
 }
 
-export function SubmitForm() {
+export function SubmitForm({ copy }: { copy: Record<string, string> }) {
   const [rows, setRows] = useState<Row[]>([blankRow()]);
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState("");
@@ -58,9 +58,9 @@ export function SubmitForm() {
   if (done) {
     return (
       <div className="paper p-6 sm:p-8" aria-live="polite">
-        <p className="text-sm tracking-[0.16em] text-[#8d6b2f] uppercase">Saved</p>
-        <h2 className="mt-2 font-serif text-3xl">Received</h2>
-        <p className="mt-3 leading-7 text-muted-foreground">These are the words you sent.</p>
+        <p className="text-sm tracking-[0.16em] text-[#8d6b2f] uppercase">{copy["submit.savedEyebrow"]}</p>
+        <h2 className="mt-2 font-serif text-3xl">{copy["submit.savedTitle"]}</h2>
+        <p className="mt-3 leading-7 text-muted-foreground">{copy["submit.savedBody"]}</p>
         <ul className="mt-5 space-y-2">
           {done.words.map((word) => (
             <li key={word} lang="gez" className="font-gez text-2xl">
@@ -70,7 +70,7 @@ export function SubmitForm() {
         </ul>
         {done.alreadyPublished.length > 0 ? (
           <p className="mt-4 text-sm leading-6 text-muted-foreground">
-            Already here: {done.alreadyPublished.join("፣ ")}.
+            {copy["submit.already"]} {done.alreadyPublished.join("፣ ")}.
           </p>
         ) : null}
         <Button
@@ -82,7 +82,7 @@ export function SubmitForm() {
             setEmail("");
           }}
         >
-          Submit another
+          {copy["submit.another"]}
         </Button>
       </div>
     );
@@ -91,18 +91,18 @@ export function SubmitForm() {
   return (
     <form onSubmit={onSubmit} className="relative space-y-5">
       <div className="paper space-y-2 p-5">
-        <Label htmlFor="email">Email, if you want a reply</Label>
+        <Label htmlFor="email">{copy["submit.emailLabel"]}</Label>
         <Input
           id="email"
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           autoComplete="email"
-          placeholder="optional"
+          placeholder={copy["submit.emailPlaceholder"]}
           className="h-11 md:text-base"
         />
         <p className="text-sm text-muted-foreground">
-          Optional. It is not shown with the word.
+          {copy["submit.emailHint"]}
         </p>
       </div>
 
@@ -119,9 +119,11 @@ export function SubmitForm() {
 
       {rows.map((row, index) => (
         <div key={row.key} className="paper space-y-4 p-5">
-          <h2 className="text-sm tracking-[0.14em] text-[#8d6b2f] uppercase">Word {index + 1}</h2>
+          <h2 className="text-sm tracking-[0.14em] text-[#8d6b2f] uppercase">
+            {copy["submit.wordHeading"]} {index + 1}
+          </h2>
           <div className="space-y-2">
-            <Label htmlFor={`${row.key}-word`}>Ge&apos;ez word</Label>
+            <Label htmlFor={`${row.key}-word`}>{copy["submit.wordLabel"]}</Label>
             <Input
               id={`${row.key}-word`}
               required
@@ -129,22 +131,22 @@ export function SubmitForm() {
               onChange={(event) => update(row.key, "word", event.target.value)}
               lang="gez"
               className="h-12 font-gez text-2xl md:text-2xl"
-              placeholder="ሰላም"
+              placeholder={copy["submit.wordPlaceholder"]}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`${row.key}-origin`}>Origin, if you know it</Label>
+            <Label htmlFor={`${row.key}-origin`}>{copy["submit.originLabel"]}</Label>
             <Input
               id={`${row.key}-origin`}
               value={row.origin}
               onChange={(event) => update(row.key, "origin", event.target.value)}
               lang="am"
               className="h-11 md:text-base"
-              placeholder="ከግሪክ የተወሰደ"
+              placeholder={copy["submit.originPlaceholder"]}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`${row.key}-definition`}>Amharic definition</Label>
+            <Label htmlFor={`${row.key}-definition`}>{copy["submit.definitionLabel"]}</Label>
             <Textarea
               id={`${row.key}-definition`}
               required
@@ -152,17 +154,17 @@ export function SubmitForm() {
               onChange={(event) => update(row.key, "definition", event.target.value)}
               lang="am"
               className="min-h-28 text-lg md:text-lg"
-              placeholder="ሰላም፤ የሰላምታ ቃል።"
+              placeholder={copy["submit.definitionPlaceholder"]}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`${row.key}-notes`}>Note</Label>
+            <Label htmlFor={`${row.key}-notes`}>{copy["submit.noteLabel"]}</Label>
             <Textarea
               id={`${row.key}-notes`}
               value={row.notes}
               onChange={(event) => update(row.key, "notes", event.target.value)}
               className="min-h-20 md:text-base"
-              placeholder="Where you found it."
+              placeholder={copy["submit.notePlaceholder"]}
             />
           </div>
           {rows.length > 1 ? (
@@ -171,7 +173,7 @@ export function SubmitForm() {
               variant="ghost"
               onClick={() => setRows((current) => current.filter((item) => item.key !== row.key))}
             >
-              Remove this word
+              {copy["submit.remove"]}
             </Button>
           ) : null}
         </div>
@@ -191,10 +193,10 @@ export function SubmitForm() {
           disabled={rows.length >= 20}
           onClick={() => setRows((current) => [...current, blankRow()])}
         >
-          Add another word
+          {copy["submit.add"]}
         </Button>
         <Button type="submit" className="h-11 px-5" disabled={pending}>
-          {pending ? "Sending…" : "Send the words"}
+          {pending ? copy["submit.sending"] : copy["submit.send"]}
         </Button>
       </div>
     </form>

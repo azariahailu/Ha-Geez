@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EntryLink } from "@/components/entry-link";
+import { loadCopy } from "@/lib/copy";
 import { getPublished, searchPublished } from "@/lib/entries";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +24,7 @@ export async function generateMetadata({
 
 export default async function EntryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const entry = await getPublished(id);
+  const [entry, copy] = await Promise.all([getPublished(id), loadCopy()]);
   if (!entry) notFound();
 
   const related = entry.letter
@@ -36,7 +37,9 @@ export default async function EntryPage({ params }: { params: Promise<{ id: stri
         href={entry.letter ? `/dictionary?letter=${encodeURIComponent(entry.letter)}` : "/dictionary"}
         className="text-sm text-muted-foreground underline decoration-[#c6a15a] underline-offset-4"
       >
-        {entry.letter ? `More under ${entry.letter}` : "Back to the dictionary"}
+        {entry.letter
+          ? copy["dictionary.more"].replace("{letter}", entry.letter)
+          : copy["dictionary.back"]}
       </Link>
       <article className="paper mt-4 px-5 py-8 sm:px-8">
         <h1 lang="gez" className="font-gez text-5xl text-primary sm:text-6xl">
@@ -52,14 +55,14 @@ export default async function EntryPage({ params }: { params: Promise<{ id: stri
         </p>
         {entry.notes ? (
           <p className="mt-6 border-t border-border pt-4 text-sm leading-6 text-muted-foreground">
-            <span className="text-foreground">Note. </span>
+            <span className="text-foreground">{copy["dictionary.note"]} </span>
             {entry.notes}
           </p>
         ) : null}
       </article>
       {related.length > 0 ? (
         <section className="mt-8">
-          <h2 className="font-serif text-2xl">Nearby</h2>
+          <h2 className="font-serif text-2xl">{copy["dictionary.nearby"]}</h2>
           <div className="mt-2">
             {related.map((item) => (
               <EntryLink key={item.id} entry={item} />

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { DictionaryBrowser } from "@/components/dictionary-browser";
+import { RichText } from "@/components/rich-text";
+import { loadCopy } from "@/lib/copy";
 import { searchPublished } from "@/lib/entries";
 
 export const dynamic = "force-dynamic";
@@ -19,21 +20,15 @@ export default async function DictionaryPage({
   const params = await searchParams;
   const query = typeof params.q === "string" ? params.q : "";
   const letter = typeof params.letter === "string" ? params.letter : "";
-  const result = await searchPublished(query, letter);
+  const [result, copy] = await Promise.all([searchPublished(query, letter), loadCopy()]);
 
   return (
     <main id="content" className="mx-auto max-w-3xl px-4 py-10">
-      <p className="text-xs tracking-[0.2em] text-[#8d6b2f] uppercase">መዝገበ ቃላት</p>
-      <h1 className="mt-2 font-serif text-4xl sm:text-5xl">Dictionary</h1>
-      <p className="mt-3 max-w-xl leading-7 text-muted-foreground">
-        Ge&apos;ez words, with origin and a meaning in Amharic. The letters run in አበገደ order:
-        አ፣ በ፣ ገ፣ ደ. Their order and meaning are on{" "}
-        <Link href="/about#abugida" className="underline decoration-[#c6a15a] underline-offset-4">
-          Letters and numbers
-        </Link>
-        {". "}
-        Spacing does not matter: ቤተ ክርስቲያን and ቤተክርስቲያን are the same search.
-      </p>
+      <p className="text-xs tracking-[0.2em] text-[#8d6b2f] uppercase">{copy["dictionary.eyebrow"]}</p>
+      <h1 className="mt-2 font-serif text-4xl sm:text-5xl">{copy["dictionary.title"]}</h1>
+      <div className="mt-3 max-w-xl leading-7 text-muted-foreground">
+        <RichText text={copy["dictionary.intro"]} />
+      </div>
       <div className="mt-6">
         <DictionaryBrowser
           key={`${query}::${letter}`}
@@ -41,6 +36,7 @@ export default async function DictionaryPage({
           initialLetter={letter}
           initialEntries={result.entries}
           initialTotal={result.total}
+          copy={Object.fromEntries(Object.entries(copy).filter(([key]) => key.startsWith("dictionary.")))}
         />
       </div>
     </main>

@@ -4,22 +4,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/dictionary", label: "Dictionary" },
-  { href: "/about", label: "About Ge'ez" },
-  { href: "/about-ha-geez", label: "About ሀ ግእዝ" },
-  { href: "/submit", label: "Submit" },
-  { href: "/admin", label: "Admin" },
-];
+type NavLink = { href: string; label: string };
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader() {
+export function SiteHeader({
+  brand,
+  subtitle,
+  links,
+  contact,
+}: {
+  brand: string;
+  subtitle: string;
+  links: NavLink[];
+  contact: NavLink;
+}) {
   const pathname = usePathname();
+  const contactActive = isActive(pathname, contact.href);
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-md">
@@ -29,7 +33,7 @@ export function SiteHeader() {
       >
         Skip to content
       </a>
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
         <Link href="/" className="flex min-w-0 items-center gap-2.5">
           <img
             src="/mark.jpg"
@@ -40,15 +44,15 @@ export function SiteHeader() {
           />
           <span className="min-w-0">
             <span lang="gez" className="font-gez block text-[1.65rem] leading-none text-primary">
-              ሀ ግእዝ
+              {brand}
             </span>
             <span className="mt-1 block text-[0.68rem] tracking-[0.14em] text-muted-foreground uppercase">
-              Ge&apos;ez → Amharic Lexicon
+              {subtitle}
             </span>
           </span>
         </Link>
-        <nav className="flex flex-wrap gap-1" aria-label="Primary">
-          {LINKS.map((link) => {
+        <nav className="ml-auto flex flex-wrap items-center justify-end gap-1" aria-label="Primary">
+          {links.map((link) => {
             const active = isActive(pathname, link.href);
             return (
               <Link
@@ -66,6 +70,18 @@ export function SiteHeader() {
               </Link>
             );
           })}
+          <Link
+            href={contact.href}
+            aria-current={contactActive ? "page" : undefined}
+            className={cn(
+              "ml-1 rounded-full px-3 py-1.5 text-sm ring-1 ring-[#c6a15a]",
+              contactActive
+                ? "bg-primary text-primary-foreground ring-primary"
+                : "text-foreground hover:bg-secondary",
+            )}
+          >
+            {contact.label}
+          </Link>
         </nav>
       </div>
       <div className="grid h-1 grid-cols-3" aria-hidden="true">

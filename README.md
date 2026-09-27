@@ -32,10 +32,11 @@ npm run build
 | `/about` | A longer paraphrase of the language's history, with the church seal |
 | `/about-ha-geez` | What this dictionary is, its sources, and a short tour |
 | `/submit` | Send one or more words |
-| `/admin` | Review words, and import a spreadsheet |
+| `/contact` | Send a message. It is kept apart from word submissions |
+| `/admin` | Review words, read messages, edit page text, and import a spreadsheet |
 | `/admin/reset` | Replace a forgotten password with the recovery code |
 
-Search ignores extra spaces, so `ቤተ ክርስቲያን` and `ቤተክርስቲያን` match. Fidel has no case. A query matches the headword, the origin, or the Amharic definition.
+Search ignores extra spaces, so `ቤተ ክርስቲያን` and `ቤተክርስቲያን` match. Fidel has no case. A typed query returns headwords that contain it, with the exact word first. If no headword matches, the search uses the origin and the Amharic definition.
 
 ## Admin
 
@@ -53,6 +54,10 @@ Once signed in:
 - **Decline** — keeps the ticket out of the lexicon. It can be restored later.
 - **Published** — correct a live entry, or send it back to the queue.
 - **Import** — load `.xlsx`, `.csv`, or `.tsv`.
+- **Messages** — notes from Contact us. They are not mixed with words waiting to be added.
+- **Pages** — edit the wording on any public page, including the header. Saving the original text clears that change. Images and the tour video can be pointed at another address from the same screen. The word list itself stays under Published.
+
+Page text, contact messages, and the word list live in the same database. Deleting `data/ha-geez.db` clears the password, the edited wording, the messages, and reloads the workbook.
 
 The session is an httpOnly cookie lasting seven days. Replacing the password signs out other sessions.
 

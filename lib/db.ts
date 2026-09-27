@@ -7,9 +7,12 @@ import { readBundledLexicon, type LexiconRow } from "@/lib/lexicon-seed";
 import { SEED_ENTRIES } from "@/lib/seed-data";
 import { wordKey } from "@/lib/text";
 
+const SCHEMA_VERSION = 2;
+
 const globalForDb = globalThis as unknown as {
   haGeezClient?: Client;
   haGeezReady?: Promise<void>;
+  haGeezSchema?: number;
 };
 
 const SCHEMA = `
@@ -39,6 +42,21 @@ CREATE TABLE IF NOT EXISTS admin_auth (
   failed_attempts INTEGER NOT NULL DEFAULT 0,
   locked_until TEXT
 );
+
+CREATE TABLE IF NOT EXISTS page_copy (
+  key TEXT PRIMARY KEY,
+  body TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  body TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at);
 `;
 
 function databaseTarget(): { url: string; authToken?: string } {
@@ -174,8 +192,9 @@ export async function getDb(): Promise<Client> {
     globalForDb.haGeezClient = createClient(target);
   }
 
-  if (!globalForDb.haGeezReady) {
+  if (!globalForDb.haGeezReady || globalForDb.haGeezSchema !== SCHEMA_VERSION) {
     const client = globalForDb.haGeezClient;
+    globalForDb.haGeezSchema = SCHEMA_VERSION;
     globalForDb.haGeezReady = client
       .executeMultiple(SCHEMA)
       .then(() => seedIfEmpty(client))

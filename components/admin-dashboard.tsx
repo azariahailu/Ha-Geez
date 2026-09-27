@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { importSheet, logoutAction, reviewEntry } from "@/lib/actions";
+import { MessageInbox } from "@/components/message-inbox";
+import type { ContactMessage } from "@/lib/messages";
 import type { AdminEntry } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -288,12 +291,18 @@ export function AdminDashboard({
   rejected,
   counts,
   query,
+  messages,
+  messageTotal,
+  pages,
 }: {
   pending: AdminEntry[];
   published: AdminEntry[];
   rejected: AdminEntry[];
   counts: { pending: number; published: number; rejected: number };
   query: string;
+  messages: ContactMessage[];
+  messageTotal: number;
+  pages: { slug: string; title: string; href: string }[];
 }) {
   return (
     <div>
@@ -322,6 +331,12 @@ export function AdminDashboard({
           </TabsTrigger>
           <TabsTrigger value="import" className="px-3 py-2">
             Import
+          </TabsTrigger>
+          <TabsTrigger value="messages" className="px-3 py-2">
+            Messages <Badge variant="secondary">{messageTotal}</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="pages" className="px-3 py-2">
+            Pages
           </TabsTrigger>
         </TabsList>
 
@@ -383,6 +398,43 @@ export function AdminDashboard({
 
         <TabsContent value="import" className="mt-5">
           <ImportPanel />
+        </TabsContent>
+
+        <TabsContent value="messages" className="mt-5">
+          <p className="mb-4 max-w-2xl text-sm leading-6 text-muted-foreground">
+            These are notes from Contact us. They stay apart from words sent for the dictionary.
+          </p>
+          <MessageInbox messages={messages} />
+          {messageTotal > messages.length ? (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Showing {messages.length} of {messageTotal}.
+            </p>
+          ) : null}
+        </TabsContent>
+
+        <TabsContent value="pages" className="mt-5">
+          <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+            Change the wording on any public page. Words in the lexicon stay under Published. A saved
+            change replaces the original line until you restore it.
+          </p>
+          <ul className="mt-4 divide-y divide-border rounded-md border border-border bg-card">
+            {pages.map((page) => (
+              <li key={page.slug} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <span className="font-serif text-xl">{page.title}</span>
+                <span className="flex gap-3 text-sm">
+                  <Link href={page.href} className="underline decoration-[#c6a15a] underline-offset-4">
+                    View
+                  </Link>
+                  <Link
+                    href={`/admin/pages/${page.slug}`}
+                    className="underline decoration-[#c6a15a] underline-offset-4"
+                  >
+                    Edit
+                  </Link>
+                </span>
+              </li>
+            ))}
+          </ul>
         </TabsContent>
       </Tabs>
     </div>

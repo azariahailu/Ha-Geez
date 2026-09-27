@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import Link from "next/link";
 import { FILTER_LETTERS } from "@/lib/fidel";
 import type { PublicEntry } from "@/lib/types";
 import { EntryLink } from "@/components/entry-link";
+import { RichText } from "@/components/rich-text";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ type Props = {
   initialLetter: string;
   initialEntries: PublicEntry[];
   initialTotal: number;
+  copy: Record<string, string>;
 };
 
 export function DictionaryBrowser({
@@ -21,6 +22,7 @@ export function DictionaryBrowser({
   initialLetter,
   initialEntries,
   initialTotal,
+  copy,
 }: Props) {
   const [query, setQuery] = useState(initialQuery);
   const [letter, setLetter] = useState(initialLetter);
@@ -85,7 +87,7 @@ export function DictionaryBrowser({
     <div>
       <form action="/dictionary" method="get" onSubmit={onSubmit} className="paper p-4 sm:p-5">
         <label htmlFor="lexicon-search" className="text-sm text-muted-foreground">
-          Search a Ge&apos;ez word or an Amharic meaning
+          {copy["dictionary.searchLabel"]}
         </label>
         <div className="mt-2 flex flex-col gap-2 sm:flex-row">
           <Input
@@ -93,22 +95,22 @@ export function DictionaryBrowser({
             name="q"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="ሰላም  ·  ውሃ"
+            placeholder={copy["dictionary.placeholder"]}
             autoComplete="off"
             spellCheck={false}
             className="h-12 font-gez text-xl md:text-xl"
           />
           {letter ? <input type="hidden" name="letter" value={letter} /> : null}
           <Button type="submit" className="h-12 px-5 sm:w-28">
-            Search
+            {copy["dictionary.searchButton"]}
           </Button>
         </div>
         <p className="mt-3 text-sm text-muted-foreground" aria-live="polite">
           {waiting
-            ? "Searching…"
+            ? copy["dictionary.searching"]
             : status === "error"
-              ? "Search failed. Check your connection and try again."
-              : `${total === 0 ? "No words match" : `Showing ${entries.length} of ${total}`}${settledQuery.trim() ? ` for “${settledQuery.trim()}”` : ""}${settledLetter ? ` under ${settledLetter}` : ""}.`}
+              ? copy["dictionary.searchFailed"]
+              : `${total === 0 ? copy["dictionary.noMatch"] : `${copy["dictionary.showing"]} ${entries.length} ${copy["dictionary.of"]} ${total}`}${settledQuery.trim() ? ` ${copy["dictionary.forQuery"]} “${settledQuery.trim()}”` : ""}${settledLetter ? ` ${copy["dictionary.underLetter"]} ${settledLetter}` : ""}.`}
         </p>
       </form>
 
@@ -127,7 +129,7 @@ export function DictionaryBrowser({
               letter === "" ? "bg-primary text-primary-foreground" : "bg-secondary hover:bg-card",
             )}
           >
-            All
+            {copy["dictionary.all"]}
           </button>
           {FILTER_LETTERS.map((character) => (
             <button
@@ -161,15 +163,9 @@ export function DictionaryBrowser({
           </p>
           <p className="mt-3 text-muted-foreground">
             {trimmed || letter ? (
-              <>
-                Nothing matches that yet. You can send the word from{" "}
-                <Link href="/submit" className="underline decoration-[#c6a15a] underline-offset-4">
-                  Submit a word
-                </Link>
-                .
-              </>
+              <RichText inline text={copy["dictionary.empty"]} />
             ) : (
-              "No words are listed yet."
+              copy["dictionary.emptyNone"]
             )}
           </p>
         </div>
@@ -180,8 +176,10 @@ export function DictionaryBrowser({
           ))}
           {entries.length < total ? (
             <p className="py-4 text-sm text-muted-foreground">
-              The list opens with these {entries.length.toLocaleString("en-US")}. Search a word, or
-              choose a letter, to see every match.
+              <RichText
+                inline
+                text={copy["dictionary.preview"].replace("{n}", entries.length.toLocaleString("en-US"))}
+              />
             </p>
           ) : null}
         </div>

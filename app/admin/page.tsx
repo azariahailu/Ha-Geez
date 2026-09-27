@@ -5,6 +5,8 @@ import { RecoveryNotice } from "@/components/recovery-notice";
 import { SetupForm } from "@/components/setup-form";
 import { hasAdminPassword, isAdmin, readRecoveryFlash } from "@/lib/auth";
 import { listAdmin, statusCounts } from "@/lib/entries";
+import { listMessages, messageCount } from "@/lib/messages";
+import { COPY_PAGES } from "@/lib/site-copy";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -56,11 +58,13 @@ export default async function AdminPage({
 
   const recoveryCode = await readRecoveryFlash();
   const query = typeof params.q === "string" ? params.q : "";
-  const [counts, pending, published, rejected] = await Promise.all([
+  const [counts, pending, published, rejected, messages, messageTotal] = await Promise.all([
     statusCounts(),
     listAdmin("pending"),
     listAdmin("published", query, 150),
     listAdmin("rejected"),
+    listMessages(),
+    messageCount(),
   ]);
 
   return (
@@ -72,6 +76,9 @@ export default async function AdminPage({
         rejected={rejected}
         counts={counts}
         query={query}
+        messages={messages}
+        messageTotal={messageTotal}
+        pages={COPY_PAGES}
       />
     </main>
   );

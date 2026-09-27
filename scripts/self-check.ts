@@ -3,6 +3,16 @@ import { buildXlsx, parseLexiconSheet } from "../lib/sheet";
 import { readBundledLexicon } from "../lib/lexicon-seed";
 import { baseLetter, FILTER_LETTERS, sortKey } from "../lib/fidel";
 import { wordKey } from "../lib/text";
+import { ALEFAT_INTRO, ALEFAT_LETTERS, FIDEL_LINES, GEEZ_NUMBERS } from "../lib/abugida-source";
+import { SEVEN_ORDERS, fieldsFor } from "../lib/site-copy";
+import {
+  ALEFAT_TEXT,
+  FIDEL_TEXT,
+  NUMBERS_TEXT,
+  parseAlefat,
+  parseFidel,
+  parseNumbers,
+} from "../lib/structured-copy";
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message);
@@ -25,6 +35,14 @@ assert(baseLetter("ቤተ ክርስቲያን") === "በ", "ቤተ ክርስቲ�
 assert(wordKey("ቤተ ክርስቲያን") === wordKey("ቤተክርስቲያን"), "spaces are ignored in the headword key");
 assert(sortKey("አ") < sortKey("በ") && sortKey("በ") < sortKey("ሀ"), "አ sorts before በ, and በ before ሀ");
 assert(sortKey("ሠ") < sortKey("ሸ"), "ሠ sorts before ሸ");
+assert(JSON.stringify(parseNumbers(NUMBERS_TEXT)) === JSON.stringify(GEEZ_NUMBERS), "number table round-trips");
+assert(JSON.stringify(parseFidel(FIDEL_TEXT)) === JSON.stringify(FIDEL_LINES), "fidel lines round-trip");
+const alefat = parseAlefat(ALEFAT_TEXT);
+assert(alefat?.intro.join("\n") === ALEFAT_INTRO.join("\n"), "alefat introduction round-trips");
+assert(JSON.stringify(alefat?.letters) === JSON.stringify(ALEFAT_LETTERS), "alefat names round-trip");
+assert(SEVEN_ORDERS.split("\n")[0] === "ሰባቱ የግእዝ ሆሄያት ቅደም ተከተል (The 7 Orders)", "seven orders title");
+assert(SEVEN_ORDERS.includes('ሳድስ (6ኛው) — "እ" ድምጽ የሚጨምር ወይም ፊደሉ ብቻውን የሚነበብ (ለምሳሌ፦ ህ)'), "sixth order text");
+assert(SEVEN_ORDERS.trim().endsWith('ሳብዕ (7ኛው) — "ኦ" ድምጽ የሚጨምር (ለምሳሌ፦ ሆ)'), "seventh order text");
 
 const csv = parseLexiconSheet(
   new TextEncoder().encode("word,origin,definition\nሰላም,መሠረታዊ,ሰላም።\n,missing,definition\n"),
@@ -141,6 +159,25 @@ const imported = await importPublished([
   { line: 3, word: "ወርኅ", origin: "መሠረታዊ የግዕዝ ቃል", definition: "ወር።" },
 ]);
 assert(imported.updated === 1 && imported.created === 1, "import updates an existing headword and adds a new one");
+
+const { loadCopy, savePageCopy } = await import("../lib/copy");
+const { insertMessage, listMessages, deleteMessage } = await import("../lib/messages");
+const homeFields = fieldsFor("home");
+const homeValues = Object.fromEntries(homeFields.map((field) => [field.key, field.defaultText]));
+homeValues["home.lede"] = "A changed line for the check.";
+assert((await savePageCopy("home", homeValues)) === null, "page text can be saved");
+assert((await loadCopy())["home.lede"] === "A changed line for the check.", "saved page text is what readers see");
+homeValues["home.lede"] = homeFields.find((field) => field.key === "home.lede")?.defaultText ?? "";
+assert((await savePageCopy("home", homeValues)) === null, "restoring the original clears the change");
+assert((await loadCopy())["home.lede"]?.includes("community lexicon"), "the original line is back");
+const aboutValues = Object.fromEntries(fieldsFor("about").map((field) => [field.key, field.defaultText]));
+aboutValues["about.numbers"] = "not a table";
+const rejectedNumbers = await savePageCopy("about", aboutValues);
+assert(typeof rejectedNumbers === "string", "a broken number table is refused");
+await insertMessage({ name: "Reader", email: "reader@example.com", body: "A note\nfrom the check" });
+const notes = await listMessages();
+assert(notes.length === 1 && notes[0]?.body === "A note\nfrom the check", "a contact message is stored on its own");
+assert(await deleteMessage(notes[0].id), "a contact message can be removed");
 
 const { createAdminPassword, hasAdminPassword, loginWithPassword, resetWithRecovery } = await import(
   "../lib/auth"
