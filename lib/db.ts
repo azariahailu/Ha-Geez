@@ -24,13 +24,12 @@ CREATE TABLE IF NOT EXISTS entries (
   letter TEXT NOT NULL DEFAULT '',
   word_key TEXT NOT NULL,
   sort_key TEXT NOT NULL DEFAULT '',
+  seq INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_entries_status ON entries(status, sort_key);
-CREATE INDEX IF NOT EXISTS idx_entries_letter ON entries(status, letter, sort_key);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_entries_published_word
-  ON entries(word_key) WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_entries_status ON entries(status, sort_key, seq);
+CREATE INDEX IF NOT EXISTS idx_entries_letter ON entries(status, letter, sort_key, seq);
 
 CREATE TABLE IF NOT EXISTS admin_auth (
   id INTEGER PRIMARY KEY CHECK (id = 1),
@@ -99,25 +98,27 @@ async function insertPublished(tx: Transaction, rows: LexiconRow[]) {
   const size = 80;
   for (let offset = 0; offset < rows.length; offset += size) {
     const group = rows.slice(offset, offset + size);
-    const placeholders = group.map(() => "(?, ?, ?, ?, '', '', 'published', ?, ?, ?, ?, ?)").join(", ");
-    const args: string[] = [];
-    for (const entry of group) {
+    const placeholders = group.map(() => "(?, ?, ?, ?, '', '', 'published', ?, ?, ?, ?, ?, ?)").join(", ");
+    const args: Array<string | number> = [];
+    group.forEach((entry, index) => {
       const key = wordKey(entry.word);
+      const seq = entry.line ?? offset + index + 1;
       args.push(
-        seedId(key),
+        seedId(`${seq}:${key}`),
         entry.word,
         entry.origin,
         entry.definition,
         baseLetter(entry.word),
         key,
         sortKey(entry.word),
+        seq,
         now,
         now,
       );
-    }
+    });
     await tx.execute({
       sql: `INSERT INTO entries (
-        id, word, origin, definition, notes, email, status, letter, word_key, sort_key, created_at, updated_at
+        id, word, origin, definition, notes, email, status, letter, word_key, sort_key, seq, created_at, updated_at
       ) VALUES ${placeholders}`,
       args,
     });

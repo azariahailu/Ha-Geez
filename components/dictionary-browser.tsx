@@ -173,7 +173,8 @@ export function DictionaryBrowser({
           ))}
           {entries.length < total ? (
             <p className="py-4 text-sm text-muted-foreground">
-              {total - entries.length} more words are hidden. Add a letter or a more specific word.
+              The list opens with these {entries.length.toLocaleString("en-US")}. Search a word, or
+              choose a letter, to see every match.
             </p>
           ) : null}
         </div>

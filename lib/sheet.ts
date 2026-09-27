@@ -76,7 +76,10 @@ function looksLikeLooseHeader(row: string[]): boolean {
   return true;
 }
 
-export function rowsFromMatrix(matrix: string[][]): SheetParse {
+export function rowsFromMatrix(
+  matrix: string[][],
+  options?: { allowEmptyDefinition?: boolean },
+): SheetParse {
   const cleaned = matrix
     .map((row) => row.map((cell) => normalize(String(cell ?? ""))))
     .filter((row) => row.some(Boolean));
@@ -125,6 +128,10 @@ export function rowsFromMatrix(matrix: string[][]): SheetParse {
     const line = index + 1;
 
     if (!word && !origin && !definition) continue;
+    if (word && !definition && options?.allowEmptyDefinition && word.length <= 120 && hasEthiopic(word)) {
+      rows.push({ line, word, origin, definition: "" });
+      continue;
+    }
     if (!word || !definition) {
       if (errors.length < 30) {
         errors.push(
@@ -309,7 +316,11 @@ function parseXlsx(bytes: Uint8Array): string[][] {
   return worksheetRows(stripNamespaces(decodeTable(sheet)), strings);
 }
 
-export function parseLexiconSheet(bytes: Uint8Array, filename = ""): SheetParse {
+export function parseLexiconSheet(
+  bytes: Uint8Array,
+  filename = "",
+  options?: { allowEmptyDefinition?: boolean },
+): SheetParse {
   if (bytes.byteLength === 0) {
     return { rows: [], errors: ["The file is empty."] };
   }
@@ -327,7 +338,7 @@ export function parseLexiconSheet(bytes: Uint8Array, filename = ""): SheetParse 
     const matrix = zip || filename.toLowerCase().endsWith(".xlsx")
       ? parseXlsx(bytes)
       : parseCsv(decodeTable(bytes));
-    return rowsFromMatrix(matrix);
+    return rowsFromMatrix(matrix, options);
   } catch (error) {
     const message = error instanceof Error ? error.message : "The file could not be read.";
     return { rows: [], errors: [message] };

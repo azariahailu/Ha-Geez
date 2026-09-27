@@ -1,6 +1,6 @@
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { buildXlsx, parseLexiconSheet } from "../lib/sheet";
-import { mergeSheetRows } from "../lib/lexicon-seed";
+import { readBundledLexicon } from "../lib/lexicon-seed";
 import { baseLetter, FILTER_LETTERS, sortKey } from "../lib/fidel";
 import { wordKey } from "../lib/text";
 
@@ -68,30 +68,20 @@ assert(
   "committed sample csv parses",
 );
 
-const repeated = mergeSheetRows([
-  { line: 1, word: "ቅኔ", origin: "ሀ", definition: "አንድ" },
-  { line: 2, word: "ቅኔ", origin: "", definition: "ሁለት" },
-  { line: 3, word: "ቅ ኔ", origin: "ሀ", definition: "አንድ" },
-]);
-assert(repeated.length === 1, "the same spelling merges");
-assert(repeated[0]?.definition === "አንድ\nሁለት", "each meaning is kept");
-assert(repeated[0]?.origin === "ሀ", "a repeated origin is kept once");
-
 const workbook = parseLexiconSheet(
   readFileSync(new URL("../data/geez-lexicon.xlsx", import.meta.url)),
   "geez-lexicon.xlsx",
+  { allowEmptyDefinition: true },
 );
-assert(workbook.rows.length > 13000, "the workbook has more than 13,000 word rows");
-const lexicon = mergeSheetRows(workbook.rows);
-assert(lexicon.length > 12000, "merged headwords stay above 12,000");
+assert(workbook.rows.length === 13079, "every word row is kept, and the introduction is not");
+const qeneRows = workbook.rows.filter((row) => row.word === "ቅኔ");
+assert(qeneRows.length > 1, "a repeated spelling stays as its own word");
 assert(
-  lexicon.some((row) => row.word === "ቤተ ክርስቲያን"),
+  workbook.rows.some((row) => row.word === "ቤተ ክርስቲያን"),
   "ቤተ ክርስቲያን is in the workbook",
 );
-assert(
-  (lexicon.find((row) => row.word === "ቅኔ")?.definition.split("\n").length ?? 0) > 1,
-  "ቅኔ keeps more than one meaning",
-);
+const bundled = readBundledLexicon();
+assert(bundled?.length === 13079, "the bundled lexicon lists every word row");
 
 async function main() {
 process.env.HA_GEEZ_SEED = "demo";

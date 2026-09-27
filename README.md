@@ -13,7 +13,7 @@ npm run dev
 
 Open [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
-No database server is required. The first run creates `data/ha-geez.db` (SQLite, via libSQL) and fills it from `data/geez-lexicon.xlsx` (more than 13,000 word rows; repeated spellings are kept together, with each meaning on its own line). Delete that file and restart to load the workbook again.
+No database server is required. The first run creates `data/ha-geez.db` (SQLite, via libSQL) and fills it from `data/geez-lexicon.xlsx`. The workbook has 13,080 rows: the first is the introduction, and the other 13,079 are words. A repeated spelling stays as its own word. Nine of those words have an origin and no definition. Delete that file and restart to load the workbook again.
 
 There is no default admin password. The first visit to `/admin` asks you to create one.
 

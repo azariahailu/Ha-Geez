@@ -57,16 +57,17 @@ function searchFilter(query: string, letter: string) {
   return { where: clauses.join(" AND "), args };
 }
 
-export async function searchPublished(query: string, letter: string, limit = 80) {
+export async function searchPublished(query: string, letter: string, limit?: number | null) {
   const client = await getDb();
   const { where, args } = searchFilter(query, letter);
+  const cap = limit === undefined ? (query.trim() || letter.trim() ? null : 80) : limit;
   const totalResult = await client.execute({
     sql: `SELECT COUNT(*) AS c FROM entries WHERE ${where}`,
     args,
   });
   const rows = await client.execute({
-    sql: `SELECT ${COLUMNS} FROM entries WHERE ${where} ORDER BY sort_key LIMIT ?`,
-    args: [...args, limit],
+    sql: `SELECT ${COLUMNS} FROM entries WHERE ${where} ORDER BY sort_key, seq${cap == null ? "" : " LIMIT ?"}`,
+    args: cap == null ? args : [...args, cap],
   });
   return {
     entries: rows.rows.map((row) => toPublic(mapEntry(row))),
@@ -129,7 +130,7 @@ export async function listAdmin(status: EntryStatus, query = "", limit = 200): P
     args.push(like, like, likeKey);
   }
   args.push(limit);
-  const order = status === "published" ? "sort_key" : "created_at DESC";
+  const order = status === "published" ? "sort_key, seq" : "created_at DESC";
   const result = await client.execute({
     sql: `SELECT ${COLUMNS} FROM entries WHERE ${where} ORDER BY ${order} LIMIT ?`,
     args,
